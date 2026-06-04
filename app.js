@@ -395,10 +395,30 @@ function wireEvents() {
   });
 }
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchJsonWithRetry(url, retries = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    try {
+      const separator = url.includes("?") ? "&" : "?";
+      const response = await fetch(`${url}${separator}v=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`${url} ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) await wait(500 * attempt);
+    }
+  }
+  throw lastError;
+}
+
 async function init() {
-  const [toolResponse, promptResponse] = await Promise.all([fetch("tools.json"), fetch("prompts.json")]);
-  tools = await toolResponse.json();
-  prompts = await promptResponse.json();
+  const [toolData, promptData] = await Promise.all([fetchJsonWithRetry("tools.json"), fetchJsonWithRetry("prompts.json")]);
+  tools = toolData;
+  prompts = promptData;
   renderAll();
   wireEvents();
 }
