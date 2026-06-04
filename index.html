@@ -12,102 +12,31 @@
       <nav class="topbar" aria-label="页面导航">
         <a class="brand" href="#">日新教师 AI 工作台</a>
         <div class="nav-links">
-          <a href="#workflow">教学路径</a>
           <a href="#tools">工具入口</a>
           <a href="#prompts">提示词</a>
-          <a href="#privacy">隐私提醒</a>
         </div>
       </nav>
 
       <section class="hero-inner" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="hero-kicker">Rixin Teacher Tool Station</p>
           <h1 id="hero-title">日新教师 AI 工作台</h1>
-          <p class="feature-pill">Tools + Prompts + Teaching Scenario Paths</p>
-          <p class="hero-text">从真实教学任务出发，选择合适的 AI 工作方式。</p>
+          <p class="hero-text">从真实教学任务出发，找到合适的工具和提示词。</p>
           <div class="hero-actions">
-            <a class="button primary" href="#workflow">按任务开始</a>
+            <a class="button primary" href="#tools">查看工具</a>
             <a class="button secondary" href="#prompts">查看提示词</a>
           </div>
         </div>
-        <aside class="hero-note" aria-label="页面核心判断">
-          <span>核心判断</span>
-          <p>AI 的价值，不只在生成内容，更在于让教师看见证据、提出好问题，并保留专业判断。</p>
-        </aside>
       </section>
     </header>
 
     <main>
-      <section class="section value-section" aria-labelledby="value-title">
-        <div class="section-heading">
-          <p class="eyebrow">工具价值层级</p>
-          <h2 id="value-title">越能反哺教学，越接近教育核心</h2>
-          <p>先把工具和提示词放在合适位置，再决定怎样演示、怎样使用。</p>
-        </div>
-        <div class="value-ladder" aria-label="价值层级：事务减负到诊断增效">
-          <div>事务减负</div>
-          <div>成果呈现</div>
-          <div>课堂组织</div>
-          <div>专业提质</div>
-          <div>诊断增效</div>
-        </div>
-      </section>
-
-      <section class="section filters-section" aria-labelledby="filter-title">
-        <div class="section-heading compact">
-          <p class="eyebrow">全局搜索</p>
-          <h2 id="filter-title">同时搜索工具和提示词</h2>
-        </div>
-        <div class="filter-panel">
-          <label class="search-label" for="global-search">搜索工具、提示词、标签或场景</label>
-          <input id="global-search" type="search" placeholder="例如：备课、作业设计、家校沟通、期末复习" autocomplete="off" />
-        </div>
-      </section>
-
-      <section class="section workflow-section" id="workflow" aria-labelledby="workflow-title">
-        <div class="section-heading">
-          <p class="eyebrow">教学场景路径</p>
-          <h2 id="workflow-title">我想完成……</h2>
-          <p>按教师真实任务组织工具和提示词，先看路径，再进入具体入口。</p>
-        </div>
-        <div class="workflow-grid" id="workflow-grid"></div>
-      </section>
-
-      <section class="section paths-section" id="paths" aria-labelledby="paths-title">
-        <div class="section-heading">
-          <p class="eyebrow">常用入口</p>
-          <h2 id="paths-title">一线教师可以从这里开始</h2>
-        </div>
-        <div class="path-grid">
-          <button class="path-card" data-path="term">
-            <span>路径一</span>
-            <strong>我想先减轻期末压力</strong>
-            <small>评语打印器、错题统计、作文报刊生成器</small>
-          </button>
-          <button class="path-card" data-path="prep">
-            <span>路径二</span>
-            <strong>我想提升备课质量</strong>
-            <small>语文要素全景图、网页知识归档器、备课提示词</small>
-          </button>
-          <button class="path-card" data-path="visible">
-            <span>路径三</span>
-            <strong>我想让学习过程更可见</strong>
-            <small>写作思维小助手、三色作文圈改、错题统计</small>
-          </button>
-        </div>
-      </section>
-
       <section class="section tools-section" id="tools" aria-labelledby="tools-title">
         <div class="tools-head">
           <div class="section-heading compact">
             <p class="eyebrow">工具卡片</p>
-            <h2 id="tools-title">统一入口，详情再展开</h2>
+            <h2 id="tools-title">工具入口</h2>
           </div>
           <p class="result-count" id="tool-result-count"></p>
-        </div>
-        <div class="filter-strip">
-          <span>工具分类</span>
-          <div class="category-scroll" id="tool-category-filters" aria-label="工具分类"></div>
         </div>
         <div class="tool-grid" id="tool-grid"></div>
       </section>
@@ -116,13 +45,9 @@
         <div class="tools-head">
           <div class="section-heading compact">
             <p class="eyebrow">提示词工作台</p>
-            <h2 id="prompts-title">常用提示词，按场景调用</h2>
+            <h2 id="prompts-title">常用提示词</h2>
           </div>
           <p class="result-count" id="prompt-result-count"></p>
-        </div>
-        <div class="filter-strip">
-          <span>提示词分类</span>
-          <div class="category-scroll" id="prompt-category-filters" aria-label="提示词分类"></div>
         </div>
         <div class="prompt-grid" id="prompt-grid"></div>
       </section>
@@ -130,12 +55,18 @@
       <section class="section privacy-section" id="privacy" aria-labelledby="privacy-title">
         <div>
           <p class="eyebrow">隐私提醒</p>
-          <h2 id="privacy-title">默认先本地、先脱敏、再发布</h2>
+          <h2 id="privacy-title">先脱敏，再使用</h2>
         </div>
-        <p>本工具默认优先在浏览器本地处理数据，不主动上传学生信息。涉及学生姓名、照片、作文、评语、家庭信息等内容，发布前必须由教师人工审查并做好脱敏处理。</p>
-        <p>外部 AI 或豆包、秘塔等工具如需上传文本、图片或学生作品，请先脱敏；AI 生成内容必须由教师审核后使用，不能替代教师判断。</p>
+        <p>涉及学生姓名、照片、作文、评语、家庭信息等内容，请先脱敏。生成内容必须由教师审核后再使用。</p>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>树懒</strong>
+        <span>公众号：字里行间的算法</span>
+      </div>
+    </footer>
 
     <dialog class="tool-dialog" id="detail-dialog" aria-labelledby="dialog-title">
       <div class="dialog-shell">

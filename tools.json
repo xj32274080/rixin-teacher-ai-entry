@@ -68,9 +68,9 @@
     "painPoint": "活动材料多、图片杂，临时做宣传图容易耗时。",
     "howToUse": "教师整理活动照片和简短文案，导入后选择版式。",
     "privacyNote": "照片发布前需要确认肖像授权并遮挡敏感信息。",
-    "link": "https://xj32274080.github.io/activity-poster-layout/",
-    "url": "https://xj32274080.github.io/activity-poster-layout/",
-    "status": "online",
+    "link": "",
+    "url": "",
+    "status": "internal",
     "platform": "GitHub Pages",
     "demoUrl": "",
     "guideUrl": "",
@@ -81,9 +81,15 @@
     "source": "GitHub: activity-poster-layout",
     "aliases": [],
     "type": "webpage",
-    "usageBoundary": "",
-    "displayNote": "",
-    "pendingLinks": []
+    "usageBoundary": "活动长图排版器目前校内专用，暂不公开；首页仅保留工具定位和使用边界，不提供截图或跳转入口。",
+    "displayNote": "校内专用，暂不公开。",
+    "pendingLinks": [
+      {
+        "label": "活动长图排版器暂不公开，公开入口待确认",
+        "url": "https://xj32274080.github.io/activity-poster-layout/"
+      }
+    ],
+    "statusText": "校内专用，暂不公开"
   },
   {
     "id": "class-magazine-generator",
@@ -195,9 +201,9 @@
     "painPoint": "想象作文容易只停留在热闹创意，缺少表达支架。",
     "howToUse": "用于想象作文课的导入、构思和展示，教师仍需把握教学目标。",
     "privacyNote": "如上传学生作品或课堂记录，请先脱敏。",
-    "link": "https://www.miaoda.cn/projects/app-b5wypfc26nsx",
-    "url": "https://www.miaoda.cn/projects/app-b5wypfc26nsx",
-    "status": "online",
+    "link": "",
+    "url": "",
+    "status": "internal",
     "platform": "妙搭",
     "demoUrl": "",
     "guideUrl": "",
@@ -213,10 +219,17 @@
       "创意表达课件"
     ],
     "type": "miaoda",
-    "usageBoundary": "这是一节想象作文课的互动课件，不是通用 AI 生成工具；适合课堂展示和活动组织。",
-    "displayNote": "",
-    "pendingLinks": [],
-    "description": "围绕“这样想象真有趣”的习作场景，帮助教师组织创意导入、构思提示和表达展示。"
+    "usageBoundary": "这样想象真有趣目前校内专用，暂不公开；详情仅展示网页截图，供教师了解工具形态。",
+    "displayNote": "校内专用，暂不公开。",
+    "pendingLinks": [
+      {
+        "label": "这样想象真有趣公开入口待确认",
+        "url": "https://www.miaoda.cn/projects/app-b5wypfc26nsx"
+      }
+    ],
+    "description": "围绕“这样想象真有趣”的习作场景，帮助教师组织创意导入、构思提示和表达展示。",
+    "screenshotUrl": "assets/tool-previews/wonder-presentation.png",
+    "statusText": "校内专用，暂不公开"
   },
   {
     "id": "rixin-teacher-tools",
@@ -574,9 +587,9 @@
     "painPoint": "学生常只知道“这里要改”，却不知道问题、改进和亮点分别在哪里。",
     "howToUse": "教师放入作文片段，引导学生通过角色反馈观察问题、修改和亮点。",
     "privacyNote": "工具不替学生写作文；作文片段进入外部工具前必须脱敏。",
-    "link": "https://app-b37lnel13e9t.appmiaoda.com/role-selection",
-    "url": "https://app-b37lnel13e9t.appmiaoda.com/role-selection",
-    "status": "online",
+    "link": "",
+    "url": "",
+    "status": "internal",
     "platform": "妙搭",
     "demoUrl": "",
     "guideUrl": "",
@@ -592,9 +605,16 @@
       "写作反馈工具"
     ],
     "type": "miaoda",
-    "usageBoundary": "AI 反馈只能作为讨论材料，不能替代教师评价；学生作文进入外部工具前必须脱敏。",
-    "displayNote": "",
-    "pendingLinks": [],
-    "description": "面向习作讲评和修改，帮助教师把作文反馈拆成更清楚的问题、修改建议和表达亮点。"
+    "usageBoundary": "看见写作目前校内专用，暂不公开；详情仅展示网页截图，供教师了解工具形态。",
+    "displayNote": "校内专用，暂不公开。",
+    "pendingLinks": [
+      {
+        "label": "看见写作公开入口待确认",
+        "url": "https://app-b37lnel13e9t.appmiaoda.com/role-selection"
+      }
+    ],
+    "description": "面向习作讲评和修改，帮助教师把作文反馈拆成更清楚的问题、修改建议和表达亮点。",
+    "screenshotUrl": "assets/tool-previews/three-color-writing-review.png",
+    "statusText": "校内专用，暂不公开"
   }
 ]

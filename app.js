@@ -25,48 +25,10 @@ const promptCategories = [
   "评价反馈"
 ];
 
-const quickPaths = {
-  term: ["comment-card-printer", "mistake-tracker", "class-magazine-generator"],
-  prep: ["xiaoxue-yuwen-quanjingtu", "web-knowledge-archiver", "yulai-reading-wall"],
-  visible: ["student-thinking-tool", "three-color-writing-review", "mistake-tracker", "rixin-teacher-tools"]
-};
-
-const workflowPaths = [
-  {
-    id: "prepare-lesson",
-    title: "我要备课",
-    steps: ["文本解读", "学情预设", "教学目标", "核心任务", "评价设计", "课件/任务单生成"],
-    toolIds: ["xiaoxue-yuwen-quanjingtu", "web-knowledge-archiver", "yulai-reading-wall"],
-    promptIds: ["lesson-text-analysis", "metaso-research-helper", "homework-design-helper"]
-  },
-  {
-    id: "design-homework",
-    title: "我要设计作业",
-    steps: ["课标/单元目标", "作业目标", "分层任务", "评价标准", "修改优化"],
-    toolIds: ["xiaoxue-yuwen-quanjingtu", "web-knowledge-archiver", "mistake-tracker"],
-    promptIds: ["homework-design-helper", "metaso-research-helper"]
-  },
-  {
-    id: "review-learning",
-    title: "我要复习",
-    steps: ["错题证据", "卡点归类", "复习目标", "分层任务", "精准讲评", "课后调整"],
-    toolIds: ["mistake-tracker", "rixin-teacher-tools", "xiaoxue-yuwen-quanjingtu"],
-    promptIds: ["homework-design-helper", "after-class-reflection"]
-  },
-  {
-    id: "family-talk",
-    title: "我要沟通",
-    steps: ["事实整理", "情绪降温", "边界表达", "合作建议", "形成沟通文本"],
-    toolIds: ["comment-card-printer"],
-    promptIds: ["family-communication-helper"]
-  }
-];
-
 let tools = [];
 let prompts = [];
 let activeToolCategory = "全部";
 let activePromptCategory = "全部";
-let activeQuickPath = null;
 let copyTimer = null;
 
 const toolGrid = document.querySelector("#tool-grid");
@@ -76,7 +38,6 @@ const promptCount = document.querySelector("#prompt-result-count");
 const searchInput = document.querySelector("#global-search");
 const toolFilters = document.querySelector("#tool-category-filters");
 const promptFilters = document.querySelector("#prompt-category-filters");
-const pathGrid = document.querySelector("#workflow-grid");
 const dialog = document.querySelector("#detail-dialog");
 const dialogContent = document.querySelector("#dialog-content");
 const dialogClose = document.querySelector("#dialog-close");
@@ -92,6 +53,7 @@ function escapeHtml(value) {
 }
 
 function statusLabel(item) {
+  if (item.statusText) return item.statusText;
   if (item.status === "internal") return "校内使用/暂不公开";
   if (item.status === "draft") return "建设中";
   if (item.status === "pending" || !item.url) return "链接待补";
@@ -146,7 +108,7 @@ function itemText(item) {
 }
 
 function matchesSearch(item) {
-  const query = searchInput.value.trim().toLowerCase();
+  const query = searchInput?.value.trim().toLowerCase() || "";
   if (!query) return true;
   return itemText(item).includes(query);
 }
@@ -158,14 +120,11 @@ function matchesToolCategory(tool) {
 
 function matchesPromptCategory(prompt) {
   if (activePromptCategory === "全部") return true;
-  return [prompt.category, prompt.platform, ...(prompt.tags || [])].join(" ").includes(activePromptCategory);
+  return [prompt.category, ...(prompt.tags || [])].join(" ").includes(activePromptCategory);
 }
 
 function visibleTools() {
-  return tools.filter((tool) => {
-    const pathMatch = activeQuickPath ? quickPaths[activeQuickPath].includes(tool.id) : true;
-    return pathMatch && matchesToolCategory(tool) && matchesSearch(tool);
-  });
+  return tools.filter((tool) => matchesToolCategory(tool) && matchesSearch(tool));
 }
 
 function visiblePrompts() {
@@ -173,6 +132,7 @@ function visiblePrompts() {
 }
 
 function renderFilterButtons(container, categories, activeValue, attrName) {
+  if (!container) return;
   container.innerHTML = categories
     .map(
       (category) => `
@@ -205,19 +165,10 @@ function renderTools() {
         <article class="tool-card">
           <div class="card-top">
             <span class="category-pill">${escapeHtml(tool.category)}</span>
-            <span class="status-pill status-${escapeHtml(tool.status)}">${escapeHtml(statusLabel(tool))}</span>
           </div>
-          <span class="type-pill">${escapeHtml(typeLabel(tool.type))}</span>
           <h3>${escapeHtml(tool.name)}</h3>
           <p class="position">${escapeHtml(tool.educationPosition)}</p>
           <p>${escapeHtml(tool.shortDescription)}</p>
-          <div class="mini-meta">
-            <span>${escapeHtml(tool.platform)}</span>
-            <span>${escapeHtml(privacyLabel(tool.privacyLevel))}</span>
-          </div>
-          <div class="tag-list">
-            ${(tool.tags || []).slice(0, 4).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
-          </div>
           <div class="card-actions">
             <a class="tool-action primary ${canOpen ? "" : "disabled"}" ${canOpen ? `href="${escapeHtml(tool.url)}" target="_blank" rel="noreferrer"` : 'aria-disabled="true"'}>
               ${canOpen ? "打开工具" : statusLabel(tool)}
@@ -245,35 +196,14 @@ function renderPrompts() {
         <article class="prompt-card">
           <div class="card-top">
             <span class="category-pill">${escapeHtml(prompt.category)}</span>
-            <span class="status-pill status-${escapeHtml(prompt.status || "draft")}">${escapeHtml(promptStatusLabel(prompt.status))}</span>
           </div>
           <h3>${escapeHtml(prompt.title)}</h3>
           <p>${escapeHtml(prompt.scenario)}</p>
-          <div class="mini-meta">
-            <span>${escapeHtml(prompt.platform)}</span>
-          </div>
-          <div class="tag-list">
-            ${(prompt.tags || []).slice(0, 4).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
-          </div>
           <div class="card-actions">
             <button class="tool-action primary" data-copy-prompt="${escapeHtml(prompt.id)}">复制提示词</button>
             <button class="tool-action secondary" data-prompt-detail="${escapeHtml(prompt.id)}">查看详情</button>
           </div>
         </article>
-      `
-    )
-    .join("");
-}
-
-function renderWorkflowPaths() {
-  pathGrid.innerHTML = workflowPaths
-    .map(
-      (path) => `
-        <button class="workflow-card" data-workflow="${escapeHtml(path.id)}">
-          <span>我想完成</span>
-          <strong>${escapeHtml(path.title)}</strong>
-          <small>${path.steps.map(escapeHtml).join(" → ")}</small>
-        </button>
       `
     )
     .join("");
@@ -315,6 +245,16 @@ function renderLinkList(tool) {
   `;
 }
 
+function renderToolPreview(tool) {
+  if (!tool.screenshotUrl) return "";
+  return `
+    <div class="detail-item full tool-preview">
+      <strong>网页截图</strong>
+      <img src="${escapeHtml(tool.screenshotUrl)}" alt="${escapeHtml(tool.name)}网页截图" loading="lazy">
+    </div>
+  `;
+}
+
 function renderToolDialog(tool) {
   dialogContent.innerHTML = `
     <p class="eyebrow">${escapeHtml(tool.source)} · ${escapeHtml(statusLabel(tool))}</p>
@@ -322,10 +262,7 @@ function renderToolDialog(tool) {
     <p>${escapeHtml(tool.educationPosition)}</p>
     <div class="dialog-meta">
       <span class="category-pill">${escapeHtml(tool.category)}</span>
-      <span class="tag">${escapeHtml(tool.valueLevel)}</span>
-      <span class="tag">${escapeHtml(typeLabel(tool.type))}</span>
-      <span class="tag">${escapeHtml(tool.platform)}</span>
-      <span class="tag">${escapeHtml(privacyLabel(tool.privacyLevel))}</span>
+      <span class="tag">${escapeHtml(statusLabel(tool))}</span>
     </div>
     <div class="detail-grid">
       <div class="detail-item"><strong>真实痛点</strong><p>${escapeHtml(tool.painPoint)}</p></div>
@@ -334,6 +271,7 @@ function renderToolDialog(tool) {
       <div class="detail-item"><strong>教师获得什么</strong><p>${escapeHtml(tool.teacherBenefit)}</p></div>
       <div class="detail-item"><strong>适用场景</strong><p>${escapeHtml((tool.scenarios || []).join("、"))}</p></div>
       <div class="detail-item"><strong>关联提示词</strong><p>${escapeHtml(relatedPromptNames(tool.recommendedPrompts))}</p></div>
+      ${renderToolPreview(tool)}
       ${renderLinkList(tool)}
       <div class="detail-item full"><strong>隐私与边界</strong><p>${escapeHtml(tool.privacyNote)}</p></div>
     </div>
@@ -343,12 +281,9 @@ function renderToolDialog(tool) {
 
 function renderPromptDialog(prompt) {
   dialogContent.innerHTML = `
-    <p class="eyebrow">${escapeHtml(prompt.category)} · ${escapeHtml(prompt.platform)} · ${escapeHtml(promptStatusLabel(prompt.status))}</p>
+    <p class="eyebrow">${escapeHtml(prompt.category)} · ${escapeHtml(promptStatusLabel(prompt.status))}</p>
     <h2 id="dialog-title">${escapeHtml(prompt.title)}</h2>
     <p>${escapeHtml(prompt.scenario)}</p>
-    <div class="dialog-meta">
-      ${(prompt.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
-    </div>
     <div class="detail-grid">
       <div class="detail-item"><strong>使用前准备</strong><p>${escapeHtml(prompt.inputNeeded)}</p></div>
       <div class="detail-item"><strong>期望输出</strong><p>${escapeHtml(prompt.outputFormat)}</p></div>
@@ -358,29 +293,6 @@ function renderPromptDialog(prompt) {
     </div>
     <div class="dialog-actions">
       <button class="tool-action primary" data-copy-prompt="${escapeHtml(prompt.id)}">复制提示词</button>
-    </div>
-  `;
-  dialog.showModal();
-}
-
-function renderWorkflowDialog(path) {
-  const recommendedTools = path.toolIds.map((id) => tools.find((tool) => tool.id === id)).filter(Boolean);
-  const recommendedPrompts = path.promptIds.map((id) => prompts.find((prompt) => prompt.id === id)).filter(Boolean);
-  dialogContent.innerHTML = `
-    <p class="eyebrow">教学场景路径</p>
-    <h2 id="dialog-title">${escapeHtml(path.title)}</h2>
-    <div class="workflow-steps">
-      ${path.steps.map((step) => `<span>${escapeHtml(step)}</span>`).join("")}
-    </div>
-    <div class="recommend-layout">
-      <div class="recommend-block">
-        <h3>推荐工具</h3>
-        ${recommendedTools.map((tool) => `<button class="recommend-row" data-tool-detail="${escapeHtml(tool.id)}"><strong>${escapeHtml(tool.name)}</strong><span>${escapeHtml(statusLabel(tool))}</span></button>`).join("")}
-      </div>
-      <div class="recommend-block">
-        <h3>推荐提示词</h3>
-        ${recommendedPrompts.map((prompt) => `<button class="recommend-row" data-prompt-detail="${escapeHtml(prompt.id)}"><strong>${escapeHtml(prompt.title)}</strong><span>${escapeHtml(prompt.platform)}</span></button>`).join("")}
-      </div>
     </div>
   `;
   dialog.showModal();
@@ -435,16 +347,15 @@ function renderAll() {
 }
 
 function wireEvents() {
-  toolFilters.addEventListener("click", (event) => {
+  toolFilters?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-tool-category]");
     if (!button) return;
     activeToolCategory = button.dataset.toolCategory;
-    activeQuickPath = null;
     renderFilters();
     renderTools();
   });
 
-  promptFilters.addEventListener("click", (event) => {
+  promptFilters?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-prompt-category]");
     if (!button) return;
     activePromptCategory = button.dataset.promptCategory;
@@ -452,28 +363,9 @@ function wireEvents() {
     renderPrompts();
   });
 
-  searchInput.addEventListener("input", () => {
-    activeQuickPath = null;
+  searchInput?.addEventListener("input", () => {
     renderTools();
     renderPrompts();
-  });
-
-  document.querySelectorAll("[data-path]").forEach((button) => {
-    button.addEventListener("click", () => {
-      activeQuickPath = button.dataset.path;
-      activeToolCategory = "全部";
-      searchInput.value = "";
-      renderFilters();
-      renderTools();
-      document.querySelector("#tools").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  });
-
-  pathGrid.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-workflow]");
-    if (!button) return;
-    const path = workflowPaths.find((item) => item.id === button.dataset.workflow);
-    if (path) renderWorkflowDialog(path);
   });
 
   document.addEventListener("click", (event) => {
@@ -507,7 +399,6 @@ async function init() {
   const [toolResponse, promptResponse] = await Promise.all([fetch("tools.json"), fetch("prompts.json")]);
   tools = await toolResponse.json();
   prompts = await promptResponse.json();
-  renderWorkflowPaths();
   renderAll();
   wireEvents();
 }
