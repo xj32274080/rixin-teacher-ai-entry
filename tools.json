@@ -616,5 +616,53 @@
     "description": "面向习作讲评和修改，帮助教师把作文反馈拆成更清楚的问题、修改建议和表达亮点。",
     "screenshotUrl": "assets/tool-previews/three-color-writing-review.png",
     "statusText": "校内专用，暂不公开"
+  },
+  {
+    "id": "four-color-evidence-observer",
+    "name": "四色证据链观察器",
+    "category": "诊断增效",
+    "tags": [
+      "课堂观察",
+      "学习证据",
+      "过程性评价",
+      "小组共学"
+    ],
+    "valueLevel": "诊断增效 / 课堂观察",
+    "educationPosition": "帮助教师在课堂中快速记录学习证据，并基于已观察样本形成谨慎反馈。",
+    "shortDescription": "用四色阶段和小组打点记录课堂证据，区分未观察与未发生。",
+    "scenarios": [
+      "课堂巡视",
+      "小组共学观察",
+      "过程性评价",
+      "课后复盘"
+    ],
+    "teacherBenefit": "降低课中记录负担，让课堂判断建立在可追溯的观察证据上。",
+    "studentBenefit": "减少把未观察误判为未完成，让学生的学习过程被更谨慎地理解。",
+    "teachingCoreLevel": "高",
+    "demoRecommended": true,
+    "demoLabel": "适合现场演示",
+    "painPoint": "课堂巡视信息零散，教师容易把没有看到误当成没有发生，也难以在课后还原证据链。",
+    "howToUse": "先设置班级小组与观察指标；课中按阶段短按小组记录组内出现证据，长按记录明确观察到的成员；课后查看样本反馈。",
+    "privacyNote": "不输入学生真实姓名，仅使用组号和成员位号；不要在班级标签或任务文本中填写可识别的学生隐私。",
+    "link": "https://xj32274080.github.io/four-color-evidence-observer/",
+    "url": "https://xj32274080.github.io/four-color-evidence-observer/",
+    "status": "online",
+    "platform": "GitHub Pages",
+    "demoUrl": "",
+    "guideUrl": "",
+    "privacyLevel": "medium",
+    "recommendedPrompts": [
+      "after-class-reflection"
+    ],
+    "source": "GitHub: four-color-evidence-observer",
+    "aliases": [
+      "四色证据观察器",
+      "课堂证据观察器",
+      "小组证据打点"
+    ],
+    "type": "webpage",
+    "usageBoundary": "组级打点只表示组内观察到该证据，不代表全组完成；未打点表示尚未观察，不代表未发生；反馈仅基于已观察样本，不能替代教师专业判断。",
+    "displayNote": "教师端课堂观察工具；建议先用模拟班级熟悉短按与长按。",
+    "pendingLinks": []
   }
 ]
