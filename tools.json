@@ -322,6 +322,58 @@
     "pendingLinks": []
   },
   {
+    "id": "curriculum-to-classroom-workbench",
+    "name": "课标到课堂｜AI 教学设计工作台",
+    "category": "专业提质",
+    "tags": [
+      "备课",
+      "课标",
+      "教学设计",
+      "证据链",
+      "单元定位"
+    ],
+    "valueLevel": "专业提质 / 备课设计",
+    "educationPosition": "把课标拆解、目标定位、评价证据、任务链和质量体检串成一套可编辑的备课流程。",
+    "shortDescription": "支持快速设计和单元精准设计，逐步生成可修改的教学设计，并导出 Markdown、Word 或 PDF。",
+    "scenarios": [
+      "单元备课",
+      "课时教学设计",
+      "评价证据设计",
+      "任务链设计",
+      "教研共备"
+    ],
+    "teacherBenefit": "减少从空白页开始备课的消耗，把目标、评价和活动的对齐过程显性化。",
+    "studentBenefit": "间接受益于更聚焦、更有证据意识的学习任务和课堂评价。",
+    "teachingCoreLevel": "高",
+    "demoRecommended": true,
+    "demoLabel": "适合现场演示",
+    "painPoint": "备课时容易把课标、目标、活动和评价分开处理，最后形成热闹但不够对齐的教学设计。",
+    "howToUse": "输入课标、课题、学情或单元材料，按流程生成并修订目标、证据、任务链、支架和质量体检，最后导出完整教学设计。",
+    "privacyNote": "不要输入学生真实姓名、家庭信息或其他可识别隐私；如接入真实模型，密钥只应放在后端环境变量中。",
+    "link": "https://xj32274080.github.io/curriculum-to-classroom-workbench/",
+    "url": "https://xj32274080.github.io/curriculum-to-classroom-workbench/",
+    "status": "online",
+    "platform": "GitHub Pages",
+    "demoUrl": "",
+    "guideUrl": "",
+    "privacyLevel": "medium",
+    "recommendedPrompts": [
+      "lesson-text-analysis",
+      "homework-design-helper"
+    ],
+    "source": "GitHub: curriculum-to-classroom-workbench",
+    "aliases": [
+      "AI教学工作台",
+      "教师备课工作台",
+      "课标到课堂",
+      "AI教学设计工作台"
+    ],
+    "type": "webpage",
+    "usageBoundary": "此工具辅助教师完成备课流程和教学设计初稿，不替代教师对课标、教材、学情和课堂可行性的专业判断；生成内容需要人工审校后使用。",
+    "displayNote": "建议先使用演示模式熟悉六步流程；正式使用时先脱敏再输入材料。",
+    "pendingLinks": []
+  },
+  {
     "id": "xiaoxue-yuwen-quanjingtu",
     "name": "小学语文要素全景图",
     "category": "专业提质",
