@@ -3,80 +3,288 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="日新教师 AI 工作台：从真实教学任务出发，找到可直接使用的工具、提示词与组合工作流。"
+    />
     <title>日新教师 AI 工作台</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <nav class="topbar" aria-label="页面导航">
-        <a class="brand" href="#">日新教师 AI 工作台</a>
-        <div class="nav-links">
-          <a href="#tools">工具入口</a>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-brand" viewBox="0 0 24 24">
+        <path d="M5 4.5h6a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5Z" />
+        <path d="M14 7.5a3 3 0 0 1 3-3h2V17a3 3 0 0 1-3 3h-2" />
+        <path d="M8 9h3M8 13h3" />
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></symbol>
+      <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5" /></symbol>
+      <symbol id="icon-lesson-plan" viewBox="0 0 24 24">
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H4V5.5Z" />
+        <path d="M14 6a3 3 0 0 1 3-3h3v15h-3a3 3 0 0 0-3 3" />
+      </symbol>
+      <symbol id="icon-book-open" viewBox="0 0 24 24">
+        <path d="M3.5 5.5A2.5 2.5 0 0 1 6 3h4a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H3.5V5.5Z" />
+        <path d="M13 6a3 3 0 0 1 3-3h4.5v14H16a3 3 0 0 0-3 3" />
+      </symbol>
+      <symbol id="icon-evidence" viewBox="0 0 24 24">
+        <path d="M5 4h14v16H5z" /><path d="M8 8h8M8 12h5M8 16h3" /><path d="m15 15 1.5 1.5L19 14" />
+      </symbol>
+      <symbol id="icon-newspaper" viewBox="0 0 24 24">
+        <path d="M4 4h13v16H6a2 2 0 0 1-2-2V4Z" /><path d="M17 8h3v10a2 2 0 0 1-2 2M7 8h7M7 12h3M12 12h2M7 16h7" />
+      </symbol>
+      <symbol id="icon-toolbox" viewBox="0 0 24 24">
+        <path d="M3 8h18v11H3z" /><path d="M8 8V5h8v3M3 12h18M10 12v2h4v-2" />
+      </symbol>
+      <symbol id="icon-printer" viewBox="0 0 24 24">
+        <path d="M7 9V3h10v6M7 17H4V9h16v8h-3M7 14h10v7H7z" /><path d="M16 12h1" />
+      </symbol>
+      <symbol id="icon-layout" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 9h16M10 9v11" /></symbol>
+      <symbol id="icon-image" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9" r="1.5" /><path d="m5 18 5-5 3 3 2-2 4 4" />
+      </symbol>
+      <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z" /><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" /></symbol>
+      <symbol id="icon-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" /><path d="M9 2h6M12 5V2M12 9v5l3 2" /></symbol>
+      <symbol id="icon-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z" /><path d="M9 3v15M15 6v15" /></symbol>
+      <symbol id="icon-archive" viewBox="0 0 24 24"><path d="M4 8h16v12H4zM3 4h18v4H3zM9 12h6" /></symbol>
+      <symbol id="icon-diagnosis" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m16 16 5 5M8 11h6M11 8v6" /></symbol>
+      <symbol id="icon-thinking" viewBox="0 0 24 24"><path d="M8 18h8M9 21h6" /><path d="M8.2 15.5A7 7 0 1 1 15.8 15.5C14.7 16.2 14 17 14 18h-4c0-1-.7-1.8-1.8-2.5Z" /><path d="M9 10h6M12 7v6" /></symbol>
+      <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z" /><path d="m13 7 4 4M4 20h16" /></symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V4H4v12h4" /></symbol>
+      <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></symbol>
+      <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4" /></symbol>
+    </svg>
+
+    <header class="site-header" id="site-header">
+      <nav class="topbar page-shell" aria-label="主导航">
+        <a class="brand" href="#start" aria-label="日新教师 AI 工作台首页">
+          <svg aria-hidden="true"><use href="#icon-brand"></use></svg>
+          <span class="brand-copy">
+            <strong>日新教师 AI 工作台</strong>
+            <small>从真实教学任务出发</small>
+          </span>
+        </a>
+        <button
+          class="menu-button icon-button"
+          id="menu-toggle"
+          type="button"
+          aria-label="打开导航菜单"
+          aria-controls="top-nav"
+          aria-expanded="false"
+        >
+          <svg aria-hidden="true"><use href="#icon-menu"></use></svg>
+        </button>
+        <div class="nav-links" id="top-nav">
+          <a href="#start">开始任务</a>
+          <a href="#featured">推荐工具</a>
+          <a href="#tools">全部工具</a>
           <a href="#prompts">提示词</a>
+          <a href="#about">关于</a>
         </div>
       </nav>
+    </header>
 
-      <section class="hero-inner" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <h1 id="hero-title">日新教师 AI 工作台</h1>
-          <p class="hero-text">从真实教学任务出发，找到合适的工具和提示词。</p>
-          <div class="hero-actions">
-            <a class="button primary" href="#tools">查看工具</a>
-            <a class="button secondary" href="#prompts">查看提示词</a>
+    <main id="main-content">
+      <section class="hero" id="start" aria-labelledby="hero-title">
+        <div class="page-shell hero-inner">
+          <div class="hero-heading">
+            <p class="eyebrow">日新教师 AI 工作台</p>
+            <h1 id="hero-title">今天，你想先解决哪件教学任务？</h1>
+            <p class="hero-text">从备课、课堂观察、写作教学到成果整理，找到适合当前任务的工具与提示词。</p>
+          </div>
+
+          <div class="search-area">
+            <label class="sr-only" for="global-search">搜索工具和提示词</label>
+            <div class="search-box">
+              <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+              <input
+                id="global-search"
+                type="search"
+                placeholder="搜索备课、作文讲评、错题统计、活动长图……"
+                autocomplete="off"
+                aria-controls="search-suggestions"
+                aria-expanded="false"
+              />
+              <button class="search-clear icon-button" id="search-clear" type="button" aria-label="清空搜索" hidden>
+                <svg aria-hidden="true"><use href="#icon-close"></use></svg>
+              </button>
+            </div>
+            <div class="search-suggestions" id="search-suggestions" role="listbox" aria-label="搜索建议" hidden></div>
+            <p class="privacy-hint">
+              <svg aria-hidden="true"><use href="#icon-lock"></use></svg>
+              涉及学生姓名、照片、作文、评语或家庭信息时，请先脱敏，再使用。
+            </p>
+          </div>
+
+          <div class="task-entry" aria-labelledby="task-entry-title">
+            <div class="task-entry-head">
+              <h2 id="task-entry-title">从高频任务开始</h2>
+              <p>选择一项任务，工作台会组合相关工具与提示词。</p>
+            </div>
+            <div class="task-grid" id="task-grid">
+              <button class="task-card" type="button" data-task="备课与作业">
+                <span class="task-icon"><svg aria-hidden="true"><use href="#icon-lesson-plan"></use></svg></span>
+                <strong>备课与作业</strong>
+                <span>梳理课标、教材、目标、任务与评价证据。</span>
+                <svg class="task-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+              </button>
+              <button class="task-card" type="button" data-task="写作与阅读">
+                <span class="task-icon"><svg aria-hidden="true"><use href="#icon-book-open"></use></svg></span>
+                <strong>写作与阅读</strong>
+                <span>支持构思、阅读理解、作文讲评和作品发表。</span>
+                <svg class="task-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+              </button>
+              <button class="task-card" type="button" data-task="课堂观察与诊断">
+                <span class="task-icon"><svg aria-hidden="true"><use href="#icon-evidence"></use></svg></span>
+                <strong>课堂观察与诊断</strong>
+                <span>记录学习证据、错因和课堂过程。</span>
+                <svg class="task-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+              </button>
+              <button class="task-card" type="button" data-task="成果整理与展示">
+                <span class="task-icon"><svg aria-hidden="true"><use href="#icon-newspaper"></use></svg></span>
+                <strong>成果整理与展示</strong>
+                <span>把作文、活动和学生作品整理成正式成果。</span>
+                <svg class="task-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+              </button>
+              <button class="task-card" type="button" data-task="班级事务与效率">
+                <span class="task-icon"><svg aria-hidden="true"><use href="#icon-toolbox"></use></svg></span>
+                <strong>班级事务与效率</strong>
+                <span>处理评语、计时、课堂组织和日常事务。</span>
+                <svg class="task-arrow" aria-hidden="true"><use href="#icon-arrow"></use></svg>
+              </button>
+            </div>
           </div>
         </div>
       </section>
-    </header>
 
-    <main>
-      <section class="section tools-section" id="tools" aria-labelledby="tools-title">
-        <div class="tools-head">
-          <div class="section-heading compact">
-            <p class="eyebrow">工具卡片</p>
-            <h2 id="tools-title">工具入口</h2>
+      <section class="section featured-section" id="featured" aria-labelledby="featured-title">
+        <div class="page-shell">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">核心推荐</p>
+              <h2 id="featured-title">先从这些工具开始</h2>
+            </div>
+            <p>优先展示已经上线、定位清楚、能够代表日新工作台方向的工具。</p>
           </div>
-          <p class="result-count" id="tool-result-count"></p>
+          <div class="featured-grid loading-grid" id="featured-grid" aria-live="polite">
+            <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+          </div>
         </div>
-        <div class="tool-grid" id="tool-grid"></div>
+      </section>
+
+      <section class="section workflow-section" id="search-results" aria-labelledby="workflow-title">
+        <div class="page-shell">
+          <div class="workflow-panel" id="workflow-panel" aria-live="polite">
+            <div class="workflow-placeholder">
+              <p class="eyebrow">为你推荐</p>
+              <h2 id="workflow-title">选择一项任务，获得一条可执行路径</h2>
+              <p>工作台会按顺序组合相关工具与提示词；搜索关键词时，也会匹配最接近的任务流。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tools-section" id="tools" aria-labelledby="tools-title">
+        <div class="page-shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">公开工具</p>
+              <h2 id="tools-title">全部工具</h2>
+              <p>用更紧凑的列表比较用途、分类与状态。</p>
+            </div>
+            <p class="result-count" id="tool-result-count" aria-live="polite">正在加载工具…</p>
+          </div>
+          <div class="filter-panel" aria-label="工具筛选">
+            <div class="category-scroll" id="tool-category-filters"></div>
+            <div class="filter-actions">
+              <label class="check-filter">
+                <input id="online-only" type="checkbox" />
+                <span>仅显示可直接使用</span>
+              </label>
+              <button class="text-button" id="clear-filters" type="button">清除筛选</button>
+            </div>
+          </div>
+          <div class="compact-tool-grid loading-grid" id="tool-grid" aria-live="polite">
+            <div class="skeleton-row"></div><div class="skeleton-row"></div>
+          </div>
+
+          <div class="internal-zone">
+            <button
+              class="internal-toggle"
+              id="internal-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="internal-panel"
+            >
+              <span>
+                <svg aria-hidden="true"><use href="#icon-lock"></use></svg>
+                <span><strong>实验项目与维护者工具</strong><small id="internal-count">校内专用、建设中与能力包</small></span>
+              </span>
+              <svg class="chevron" aria-hidden="true"><use href="#icon-chevron"></use></svg>
+            </button>
+            <div class="internal-panel" id="internal-panel" hidden>
+              <p class="internal-note">这些项目不提供公开跳转；状态和使用边界请在详情中查看。</p>
+              <div class="internal-list" id="internal-list"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section class="section prompt-section" id="prompts" aria-labelledby="prompts-title">
-        <div class="tools-head">
-          <div class="section-heading compact">
-            <p class="eyebrow">提示词工作台</p>
-            <h2 id="prompts-title">常用提示词</h2>
+        <div class="page-shell">
+          <div class="section-heading split-heading">
+            <div>
+              <p class="eyebrow">复制即用</p>
+              <h2 id="prompts-title">常用提示词</h2>
+              <p>先准备必要材料，再复制完整提示词到你常用的 AI 工具。</p>
+            </div>
+            <p class="result-count" id="prompt-result-count" aria-live="polite">正在加载提示词…</p>
           </div>
-          <p class="result-count" id="prompt-result-count"></p>
+          <div class="prompt-toolbar">
+            <div class="category-scroll" id="prompt-category-filters"></div>
+            <button class="text-button" id="toggle-prompts" type="button" aria-expanded="false">查看全部提示词</button>
+          </div>
+          <div class="prompt-list loading-grid" id="prompt-grid" aria-live="polite">
+            <div class="skeleton-row"></div><div class="skeleton-row"></div>
+          </div>
         </div>
-        <div class="prompt-grid" id="prompt-grid"></div>
-      </section>
-
-      <section class="section privacy-section" id="privacy" aria-labelledby="privacy-title">
-        <div>
-          <p class="eyebrow">隐私提醒</p>
-          <h2 id="privacy-title">先脱敏，再使用</h2>
-        </div>
-        <p>涉及学生姓名、照片、作文、评语、家庭信息等内容，请先脱敏。生成内容必须由教师审核后再使用。</p>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div>
-        <strong>树懒</strong>
-        <span>公众号：字里行间的算法</span>
+    <footer class="site-footer" id="about">
+      <div class="page-shell footer-grid">
+        <div>
+          <div class="footer-brand">
+            <svg aria-hidden="true"><use href="#icon-brand"></use></svg>
+            <strong>日新教师 AI 工作台</strong>
+          </div>
+          <p>面向小学教师、一线教师培训和校本教研的任务型 AI 工作入口。</p>
+        </div>
+        <div class="footer-meta">
+          <p>由“字里行间的算法”持续整理与维护</p>
+          <p>维护者署名：树懒 · 使用学生材料前请先脱敏并人工审核</p>
+          <p><a href="https://github.com/xj32274080/rixin-teacher-ai-entry" target="_blank" rel="noopener noreferrer">GitHub 项目入口</a> · V2 预览版</p>
+        </div>
       </div>
     </footer>
 
-    <dialog class="tool-dialog" id="detail-dialog" aria-labelledby="dialog-title">
+    <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="dialog-title">
       <div class="dialog-shell">
-        <button class="icon-button" id="dialog-close" aria-label="关闭详情">×</button>
+        <button class="dialog-close icon-button" id="dialog-close" type="button" aria-label="关闭详情">
+          <svg aria-hidden="true"><use href="#icon-close"></use></svg>
+        </button>
         <div id="dialog-content"></div>
       </div>
     </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
     <script src="app.js"></script>
   </body>
 </html>
