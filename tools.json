@@ -1,6 +1,14 @@
 [
   {
     "id": "comment-card-printer",
+    "primaryCategory": "班级事务",
+    "taskGroups": ["班级事务与效率", "成果整理与展示"],
+    "visibility": "public",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "printer",
+    "homepageSummary": "批量整理评语，快速生成可打印的成长卡片。",
+    "searchKeywords": ["评语", "打印", "期末", "成长卡"],
     "name": "期末评语批量排版打印器",
     "category": "事务减负",
     "tags": [
@@ -44,6 +52,14 @@
   },
   {
     "id": "activity-poster-layout",
+    "primaryCategory": "成果呈现",
+    "taskGroups": ["成果整理与展示"],
+    "visibility": "internal",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "layout",
+    "homepageSummary": "把活动文字与图片整理成适合发布的长图。",
+    "searchKeywords": ["活动长图", "海报", "活动报道", "排版"],
     "name": "活动长图排版器",
     "category": "事务减负",
     "tags": [
@@ -93,6 +109,14 @@
   },
   {
     "id": "class-magazine-generator",
+    "primaryCategory": "成果呈现",
+    "taskGroups": ["成果整理与展示", "写作与阅读"],
+    "visibility": "public",
+    "featured": true,
+    "featuredOrder": 6,
+    "icon": "newspaper",
+    "homepageSummary": "把学生作文整理成班级报纸、刊物或打印版。",
+    "searchKeywords": ["作文报", "班刊", "作品发表", "在线杂志"],
     "name": "班级作文报纸 / 在线杂志生成器",
     "category": "成果呈现",
     "tags": [
@@ -136,6 +160,14 @@
   },
   {
     "id": "student-artwork-cleaner",
+    "primaryCategory": "成果呈现",
+    "taskGroups": ["成果整理与展示"],
+    "visibility": "public",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "image",
+    "homepageSummary": "清理作品照片背景，用于展板、作品墙和展示。",
+    "searchKeywords": ["美术作品", "照片清理", "作品墙", "展板"],
     "name": "学生美术作品照片清洗器",
     "category": "成果呈现",
     "tags": [
@@ -177,6 +209,14 @@
   },
   {
     "id": "wonder-presentation",
+    "primaryCategory": "写作与阅读",
+    "taskGroups": ["写作与阅读"],
+    "visibility": "internal",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "spark",
+    "homepageSummary": "组织想象作文的情境导入、构思与表达展示。",
+    "searchKeywords": ["想象作文", "创意表达", "作文课件", "课堂展示"],
     "name": "这样想象真有趣",
     "category": "习作教学 / 想象作文 / 创意表达",
     "tags": [
@@ -233,6 +273,14 @@
   },
   {
     "id": "rixin-teacher-tools",
+    "primaryCategory": "班级事务",
+    "taskGroups": ["课堂观察与诊断", "班级事务与效率"],
+    "visibility": "public",
+    "featured": true,
+    "featuredOrder": 5,
+    "icon": "toolbox",
+    "homepageSummary": "集中进入错题记录、课堂组织与常用教学模块。",
+    "searchKeywords": ["教师工具箱", "错题", "随机点名", "课堂组织"],
     "name": "日新教师工具箱",
     "category": "课堂组织 / 聚合入口",
     "tags": [
@@ -281,6 +329,14 @@
   },
   {
     "id": "focus-timer",
+    "primaryCategory": "班级事务",
+    "taskGroups": ["班级事务与效率"],
+    "visibility": "public",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "timer",
+    "homepageSummary": "为阅读、自主学习和课堂任务建立清晰时间边界。",
+    "searchKeywords": ["计时器", "专注", "倒计时", "课堂计时"],
     "name": "专注计时小站",
     "category": "课堂组织",
     "tags": [
@@ -323,6 +379,14 @@
   },
   {
     "id": "curriculum-to-classroom-workbench",
+    "primaryCategory": "教学设计",
+    "taskGroups": ["备课与作业"],
+    "visibility": "public",
+    "featured": true,
+    "featuredOrder": 1,
+    "icon": "lesson-plan",
+    "homepageSummary": "从课标、目标和证据出发完成教学设计。",
+    "searchKeywords": ["备课", "课标", "单元设计", "教学设计"],
     "name": "课标到课堂｜AI 教学设计工作台",
     "category": "专业提质",
     "tags": [
@@ -375,6 +439,14 @@
   },
   {
     "id": "xiaoxue-yuwen-quanjingtu",
+    "primaryCategory": "教研与资料",
+    "taskGroups": ["备课与作业"],
+    "visibility": "public",
+    "featured": true,
+    "featuredOrder": 4,
+    "icon": "map",
+    "homepageSummary": "从整册与学段能力链定位语文单元和课文。",
+    "searchKeywords": ["语文要素", "全景图", "单元统整", "复习地图"],
     "name": "小学语文要素全景图",
     "category": "专业提质",
     "tags": [
@@ -420,6 +492,14 @@
   },
   {
     "id": "web-knowledge-archiver",
+    "primaryCategory": "教研与资料",
+    "taskGroups": ["备课与作业"],
+    "visibility": "maintainer",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "archive",
+    "homepageSummary": "把网页资料整理为可复用的个人知识资产。",
+    "searchKeywords": ["网页归档", "知识库", "Obsidian", "NotebookLM"],
     "name": "网页知识归档器",
     "category": "专业提质",
     "tags": [
@@ -470,6 +550,14 @@
   },
   {
     "id": "yulai-reading-wall",
+    "primaryCategory": "写作与阅读",
+    "taskGroups": ["写作与阅读"],
+    "visibility": "public",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "book-open",
+    "homepageSummary": "围绕课例组织情节梳理、人物理解和文本讨论。",
+    "searchKeywords": ["小英雄雨来", "阅读理解", "人物分析", "互动墙"],
     "name": "小英雄雨来",
     "category": "语文学习 / 阅读理解 / 课堂互动",
     "tags": [
@@ -520,6 +608,14 @@
   },
   {
     "id": "mistake-tracker",
+    "primaryCategory": "课堂观察与诊断",
+    "taskGroups": ["课堂观察与诊断", "班级事务与效率"],
+    "visibility": "public",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "diagnosis",
+    "homepageSummary": "记录错题类型与错因，为讲评和复习提供依据。",
+    "searchKeywords": ["错题统计", "错因", "精准讲评", "复习"],
     "name": "错题统计 / 错题记录",
     "category": "诊断增效",
     "tags": [
@@ -570,6 +666,14 @@
   },
   {
     "id": "student-thinking-tool",
+    "primaryCategory": "写作与阅读",
+    "taskGroups": ["写作与阅读"],
+    "visibility": "public",
+    "featured": true,
+    "featuredOrder": 2,
+    "icon": "thinking",
+    "homepageSummary": "用追问、卡片和口述留下学生的写作思维痕迹。",
+    "searchKeywords": ["写作构思", "口述作文", "学生思维", "作文教学"],
     "name": "写作思维小助手",
     "category": "诊断增效",
     "tags": [
@@ -614,6 +718,14 @@
   },
   {
     "id": "three-color-writing-review",
+    "primaryCategory": "写作与阅读",
+    "taskGroups": ["写作与阅读"],
+    "visibility": "internal",
+    "featured": false,
+    "featuredOrder": null,
+    "icon": "edit",
+    "homepageSummary": "把作文反馈转化为学生看得见的修改线索。",
+    "searchKeywords": ["作文讲评", "写作反馈", "修改支架", "三色作文"],
     "name": "看见写作",
     "category": "习作教学 / 写作反馈 / 思维可视化",
     "tags": [
@@ -671,6 +783,14 @@
   },
   {
     "id": "four-color-evidence-observer",
+    "primaryCategory": "课堂观察与诊断",
+    "taskGroups": ["课堂观察与诊断"],
+    "visibility": "public",
+    "featured": true,
+    "featuredOrder": 3,
+    "icon": "evidence",
+    "homepageSummary": "用四色阶段与小组打点快速记录课堂学习证据。",
+    "searchKeywords": ["课堂观察", "学习证据", "小组观察", "过程性评价"],
     "name": "四色证据链观察器",
     "category": "诊断增效",
     "tags": [
