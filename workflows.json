@@ -14,11 +14,11 @@
       "after-class-reflection"
     ],
     "steps": [
-      {"type": "tool", "id": "xiaoxue-yuwen-quanjingtu", "label": "先确认单元和学段能力位置"},
-      {"type": "prompt", "id": "lesson-text-analysis", "label": "完成单元定位型文本解读"},
-      {"type": "tool", "id": "curriculum-to-classroom-workbench", "label": "把目标、证据与任务链组织成教学设计"},
-      {"type": "prompt", "id": "homework-design-helper", "label": "补充分层作业与评价观察点"},
-      {"type": "prompt", "id": "after-class-reflection", "label": "课后根据课堂证据完成复盘"}
+      {"type": "tool", "id": "xiaoxue-yuwen-quanjingtu", "label": "先确认单元和学段能力位置", "shortLabel": "要素定位"},
+      {"type": "prompt", "id": "lesson-text-analysis", "label": "完成单元定位型文本解读", "shortLabel": "文本解读"},
+      {"type": "tool", "id": "curriculum-to-classroom-workbench", "label": "把目标、证据与任务链组织成教学设计", "shortLabel": "教学设计"},
+      {"type": "prompt", "id": "homework-design-helper", "label": "补充分层作业与评价观察点", "shortLabel": "作业设计"},
+      {"type": "prompt", "id": "after-class-reflection", "label": "课后根据课堂证据完成复盘", "shortLabel": "课后复盘"}
     ]
   },
   {
@@ -34,11 +34,11 @@
     ],
     "promptIds": ["lesson-text-analysis", "homework-design-helper"],
     "steps": [
-      {"type": "tool", "id": "yulai-reading-wall", "label": "用课例支架组织文本证据讨论"},
-      {"type": "prompt", "id": "lesson-text-analysis", "label": "定位阅读课最值得抓的核心能力"},
-      {"type": "tool", "id": "student-thinking-tool", "label": "通过追问与卡片留下写作构思过程"},
-      {"type": "tool", "id": "three-color-writing-review", "label": "结合可用条件完成作文讲评与修改"},
-      {"type": "tool", "id": "class-magazine-generator", "label": "审核脱敏后整理并发表学生作品"}
+      {"type": "tool", "id": "yulai-reading-wall", "label": "用课例支架组织文本证据讨论", "shortLabel": "文本讨论"},
+      {"type": "prompt", "id": "lesson-text-analysis", "label": "定位阅读课最值得抓的核心能力", "shortLabel": "能力定位"},
+      {"type": "tool", "id": "student-thinking-tool", "label": "通过追问与卡片留下写作构思过程", "shortLabel": "写前构思"},
+      {"type": "tool", "id": "three-color-writing-review", "label": "结合可用条件完成作文讲评与修改", "shortLabel": "讲评修改"},
+      {"type": "tool", "id": "class-magazine-generator", "label": "审核脱敏后整理并发表学生作品", "shortLabel": "作品发表"}
     ]
   },
   {
@@ -49,10 +49,10 @@
     "toolIds": ["four-color-evidence-observer", "mistake-tracker", "rixin-teacher-tools"],
     "promptIds": ["lesson-observation-review", "after-class-reflection", "transcript-review-template"],
     "steps": [
-      {"type": "tool", "id": "four-color-evidence-observer", "label": "课中记录已观察到的学习证据"},
-      {"type": "tool", "id": "mistake-tracker", "label": "汇总错误类型与可能卡点"},
-      {"type": "prompt", "id": "lesson-observation-review", "label": "围绕目标、活动、评价和证据进行审辨"},
-      {"type": "prompt", "id": "after-class-reflection", "label": "把课堂事实整理成可继续研究的复盘"}
+      {"type": "tool", "id": "four-color-evidence-observer", "label": "课中记录已观察到的学习证据", "shortLabel": "证据记录"},
+      {"type": "tool", "id": "mistake-tracker", "label": "汇总错误类型与可能卡点", "shortLabel": "错因诊断"},
+      {"type": "prompt", "id": "lesson-observation-review", "label": "围绕目标、活动、评价和证据进行审辨", "shortLabel": "课堂审辨"},
+      {"type": "prompt", "id": "after-class-reflection", "label": "把课堂事实整理成可继续研究的复盘", "shortLabel": "课后复盘"}
     ]
   },
   {
@@ -63,10 +63,10 @@
     "toolIds": ["class-magazine-generator", "student-artwork-cleaner", "comment-card-printer", "activity-poster-layout"],
     "promptIds": ["family-communication-helper"],
     "steps": [
-      {"type": "tool", "id": "student-artwork-cleaner", "label": "清理作品照片并移除可识别信息"},
-      {"type": "tool", "id": "class-magazine-generator", "label": "把作文整理成班级刊物或打印版"},
-      {"type": "tool", "id": "comment-card-printer", "label": "需要时制作评语或成长卡片"},
-      {"type": "prompt", "id": "family-communication-helper", "label": "整理对外发布或家校沟通文字"}
+      {"type": "tool", "id": "student-artwork-cleaner", "label": "清理作品照片并移除可识别信息", "shortLabel": "图片清理"},
+      {"type": "tool", "id": "class-magazine-generator", "label": "把作文整理成班级刊物或打印版", "shortLabel": "刊物排版"},
+      {"type": "tool", "id": "comment-card-printer", "label": "需要时制作评语或成长卡片", "shortLabel": "成长卡片"},
+      {"type": "prompt", "id": "family-communication-helper", "label": "整理对外发布或家校沟通文字", "shortLabel": "发布文字"}
     ]
   },
   {
@@ -77,10 +77,10 @@
     "toolIds": ["comment-card-printer", "focus-timer", "rixin-teacher-tools", "mistake-tracker"],
     "promptIds": ["family-communication-helper"],
     "steps": [
-      {"type": "tool", "id": "rixin-teacher-tools", "label": "从工具箱选择当前课堂组织模块"},
-      {"type": "tool", "id": "focus-timer", "label": "为学习任务建立清晰时间边界"},
-      {"type": "tool", "id": "comment-card-printer", "label": "批量整理并打印评语卡片"},
-      {"type": "prompt", "id": "family-communication-helper", "label": "把沟通内容整理得清楚、有边界"}
+      {"type": "tool", "id": "rixin-teacher-tools", "label": "从工具箱选择当前课堂组织模块", "shortLabel": "选择模块"},
+      {"type": "tool", "id": "focus-timer", "label": "为学习任务建立清晰时间边界", "shortLabel": "任务计时"},
+      {"type": "tool", "id": "comment-card-printer", "label": "批量整理并打印评语卡片", "shortLabel": "评语排版"},
+      {"type": "prompt", "id": "family-communication-helper", "label": "把沟通内容整理得清楚、有边界", "shortLabel": "家校沟通"}
     ]
   }
 ]

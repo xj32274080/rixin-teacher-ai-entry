@@ -22,6 +22,7 @@ const PROMPT_CATEGORIES = [
 ];
 
 const ALLOWED_ICONS = new Set([
+  "home",
   "lesson-plan",
   "book-open",
   "evidence",
@@ -39,8 +40,23 @@ const ALLOWED_ICONS = new Set([
   "edit",
   "copy",
   "lock",
-  "arrow"
+  "arrow",
+  "info"
 ]);
+
+const HOME_TOOL_IDS = {
+  quick: [
+    "curriculum-to-classroom-workbench",
+    "student-thinking-tool",
+    "four-color-evidence-observer",
+    "mistake-tracker"
+  ],
+  writing: ["student-thinking-tool", "three-color-writing-review", "class-magazine-generator"],
+  observation: ["four-color-evidence-observer", "mistake-tracker"]
+};
+
+const HOME_PROMPT_IDS = ["lesson-text-analysis", "homework-design-helper", "lesson-observation-review"];
+const VIEW_NAMES = { home: "首页", tools: "全部工具", prompts: "提示词库" };
 
 const state = {
   tools: [],
@@ -51,20 +67,32 @@ const state = {
   activeToolCategory: "全部",
   activePromptCategory: "全部",
   onlineOnly: false,
-  showAllPrompts: false,
+  currentView: "home",
   loadErrors: { tools: false, prompts: false, workflows: false }
 };
 
 const dom = {
   header: document.querySelector("#site-header"),
+  sidebar: document.querySelector("#app-sidebar"),
+  sidebarScrim: document.querySelector("#sidebar-scrim"),
   menuToggle: document.querySelector("#menu-toggle"),
   topNav: document.querySelector("#top-nav"),
+  viewPanels: [...document.querySelectorAll("[data-view-panel]")],
   searchInput: document.querySelector("#global-search"),
+  toolSearch: document.querySelector("#tool-search"),
+  promptSearch: document.querySelector("#prompt-search"),
   searchClear: document.querySelector("#search-clear"),
   searchSuggestions: document.querySelector("#search-suggestions"),
   taskGrid: document.querySelector("#task-grid"),
-  featuredGrid: document.querySelector("#featured-grid"),
-  workflowPanel: document.querySelector("#workflow-panel"),
+  quickToolList: document.querySelector("#quick-tool-list"),
+  workflowSummary: document.querySelector("#workflow-summary"),
+  coreToolFeature: document.querySelector("#core-tool-feature"),
+  writingTools: document.querySelector("#writing-tools"),
+  observationTools: document.querySelector("#observation-tools"),
+  homePromptList: document.querySelector("#home-prompt-list"),
+  updateList: document.querySelector("#update-list"),
+  writingZone: document.querySelector("#writing-zone"),
+  observationZone: document.querySelector("#observation-zone"),
   toolFilters: document.querySelector("#tool-category-filters"),
   onlineOnly: document.querySelector("#online-only"),
   clearFilters: document.querySelector("#clear-filters"),
@@ -77,7 +105,6 @@ const dom = {
   promptFilters: document.querySelector("#prompt-category-filters"),
   promptGrid: document.querySelector("#prompt-grid"),
   promptCount: document.querySelector("#prompt-result-count"),
-  togglePrompts: document.querySelector("#toggle-prompts"),
   dialog: document.querySelector("#detail-dialog"),
   dialogContent: document.querySelector("#dialog-content"),
   dialogClose: document.querySelector("#dialog-close"),
@@ -133,7 +160,7 @@ function inferPrimaryCategory(tool) {
 
 function inferVisibility(tool) {
   if (tool.status === "internal") return tool.type === "skill" ? "maintainer" : "internal";
-  if (tool.status === "draft" || tool.status === "pending") return "internal";
+  if (["draft", "pending"].includes(tool.status)) return "internal";
   return "public";
 }
 
@@ -158,7 +185,8 @@ function normalizeTool(tool) {
     tags: arrayValue(tool.tags),
     scenarios: arrayValue(tool.scenarios),
     aliases: arrayValue(tool.aliases),
-    recommendedPrompts: arrayValue(tool.recommendedPrompts)
+    recommendedPrompts: arrayValue(tool.recommendedPrompts),
+    updatedAt: typeof tool.updatedAt === "string" ? tool.updatedAt : ""
   };
 }
 
@@ -173,7 +201,8 @@ function normalizePrompt(prompt) {
     homepageSummary: String(prompt.homepageSummary || prompt.scenario || "查看完整提示词与使用说明。"),
     searchKeywords: arrayValue(prompt.searchKeywords),
     tags: arrayValue(prompt.tags),
-    relatedTools: arrayValue(prompt.relatedTools)
+    relatedTools: arrayValue(prompt.relatedTools),
+    updatedAt: typeof prompt.updatedAt === "string" ? prompt.updatedAt : ""
   };
 }
 
@@ -225,14 +254,19 @@ function itemSearchText(item) {
     ...arrayValue(item.scenarios),
     ...arrayValue(item.searchKeywords),
     ...arrayValue(item.taskGroups)
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLocaleLowerCase("zh-CN");
+  ].filter(Boolean).join(" ").toLocaleLowerCase("zh-CN");
 }
 
 function matchesQuery(item) {
   return !state.query || itemSearchText(item).includes(state.query.toLocaleLowerCase("zh-CN"));
+}
+
+function getTool(id) {
+  return state.tools.find((tool) => tool.id === id);
+}
+
+function getPrompt(id) {
+  return state.prompts.find((prompt) => prompt.id === id);
 }
 
 function visiblePublicTools() {
@@ -246,35 +280,11 @@ function visiblePublicTools() {
 }
 
 function matchingPrompts() {
-  const filtered = state.prompts.filter((prompt) => {
+  return state.prompts.filter((prompt) => {
     if (state.activePromptCategory !== "全部" && prompt.category !== state.activePromptCategory) return false;
     if (state.activeTask && !prompt.taskGroups.includes(state.activeTask)) return false;
     return matchesQuery(prompt);
   });
-  const shouldLimit = !state.showAllPrompts && !state.query && !state.activeTask && state.activePromptCategory === "全部";
-  return shouldLimit
-    ? filtered.filter((prompt) => prompt.featured).sort((a, b) => a.featuredOrder - b.featuredOrder).slice(0, 6)
-    : filtered;
-}
-
-function renderFilters() {
-  dom.toolFilters.innerHTML = TOOL_CATEGORIES.map((category) => `
-    <button
-      class="filter-button ${category === state.activeToolCategory ? "is-active" : ""}"
-      type="button"
-      data-tool-category="${escapeHtml(category)}"
-      aria-pressed="${category === state.activeToolCategory}"
-    >${escapeHtml(category)}</button>
-  `).join("");
-
-  dom.promptFilters.innerHTML = PROMPT_CATEGORIES.map((category) => `
-    <button
-      class="filter-button ${category === state.activePromptCategory ? "is-active" : ""}"
-      type="button"
-      data-prompt-category="${escapeHtml(category)}"
-      aria-pressed="${category === state.activePromptCategory}"
-    >${escapeHtml(category)}</button>
-  `).join("");
 }
 
 function toolOpenLink(tool, label = "打开工具", className = "button primary-button") {
@@ -283,78 +293,222 @@ function toolOpenLink(tool, label = "打开工具", className = "button primary-
   return `<a class="${escapeHtml(className)}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}${iconMarkup("arrow", "button-arrow")}</a>`;
 }
 
-function renderFeaturedTools() {
+function renderFilters() {
+  dom.toolFilters.innerHTML = TOOL_CATEGORIES.map((category) => `
+    <button class="filter-button ${category === state.activeToolCategory ? "is-active" : ""}" type="button" data-tool-category="${escapeHtml(category)}" aria-pressed="${category === state.activeToolCategory}">${escapeHtml(category)}</button>
+  `).join("");
+
+  dom.promptFilters.innerHTML = PROMPT_CATEGORIES.map((category) => `
+    <button class="filter-button ${category === state.activePromptCategory ? "is-active" : ""}" type="button" data-prompt-category="${escapeHtml(category)}" aria-pressed="${category === state.activePromptCategory}">${escapeHtml(category)}</button>
+  `).join("");
+}
+
+function renderQuickTools() {
   if (state.loadErrors.tools) {
-    dom.featuredGrid.innerHTML = '<div class="error-state">推荐工具暂时无法加载，其他内容仍可继续查看。</div>';
+    dom.quickToolList.innerHTML = '<div class="error-state compact-state">常用工具暂时无法加载。</div>';
     return;
   }
-  const featured = state.tools
-    .filter((tool) => tool.featured && isPublicTool(tool))
-    .sort((a, b) => a.featuredOrder - b.featuredOrder)
-    .slice(0, 6);
-
-  if (!featured.length) {
-    dom.featuredGrid.innerHTML = '<div class="empty-state">当前没有可展示的推荐工具。</div>';
-    return;
-  }
-
-  dom.featuredGrid.classList.remove("loading-grid");
-  dom.featuredGrid.innerHTML = featured.map((tool) => {
-    const preview = safeLocalAsset(tool.screenshotUrl);
-    return `
-      <article class="featured-card">
-        <div class="featured-visual ${preview ? "has-preview" : ""}">
-          ${preview
-            ? `<img src="${escapeHtml(preview)}" alt="${escapeHtml(tool.name)}网页预览" width="640" height="360" loading="lazy" data-preview-image /><span class="image-fallback" hidden>${iconMarkup(tool.icon)}</span>`
-            : `<span class="featured-icon">${iconMarkup(tool.icon)}</span>`}
-          <span class="task-pill">${escapeHtml(tool.taskGroups[0] || tool.primaryCategory)}</span>
-        </div>
-        <div class="featured-content">
-          <div class="card-meta"><span>${escapeHtml(tool.primaryCategory)}</span><span>${escapeHtml(tool.platform || typeLabel(tool.type))}</span></div>
-          <h3>${escapeHtml(tool.name)}</h3>
-          <p>${escapeHtml(tool.homepageSummary)}</p>
-          <div class="card-actions">
-            ${toolOpenLink(tool)}
-            <button class="button secondary-button" type="button" data-tool-detail="${escapeHtml(tool.id)}">查看详情</button>
-          </div>
-        </div>
-      </article>
-    `;
+  const shortNames = {
+    "curriculum-to-classroom-workbench": "AI 教学设计工作台",
+    "student-thinking-tool": "写作思维小助手",
+    "four-color-evidence-observer": "四色证据链",
+    "mistake-tracker": "错题记录本"
+  };
+  dom.quickToolList.innerHTML = HOME_TOOL_IDS.quick.map(getTool).filter(Boolean).map((tool) => {
+    const content = `<span class="quick-tool-icon">${iconMarkup(tool.icon)}</span><span>${escapeHtml(shortNames[tool.id] || tool.name)}</span>${iconMarkup("arrow", "quick-arrow")}`;
+    return isOpenable(tool)
+      ? `<a class="quick-tool" href="${escapeHtml(safeExternalUrl(tool.url))}" target="_blank" rel="noopener noreferrer">${content}</a>`
+      : `<button class="quick-tool" type="button" data-tool-detail="${escapeHtml(tool.id)}">${content}</button>`;
   }).join("");
+}
+
+function currentWorkflow() {
+  if (state.activeTask) return state.workflows.find((workflow) => workflow.title === state.activeTask) || null;
+  if (state.query.length >= 2) {
+    const query = state.query.toLocaleLowerCase("zh-CN");
+    const ranked = state.workflows.map((workflow) => ({
+      workflow,
+      score: ([workflow.title, workflow.description].join(" ").toLocaleLowerCase("zh-CN").includes(query) ? 4 : 0)
+        + arrayValue(workflow.toolIds).reduce((sum, id) => sum + (itemSearchText(getTool(id) || {}).includes(query) ? 2 : 0), 0)
+        + arrayValue(workflow.promptIds).reduce((sum, id) => sum + (itemSearchText(getPrompt(id) || {}).includes(query) ? 1 : 0), 0)
+    })).sort((a, b) => b.score - a.score);
+    if (ranked[0]?.score > 0) return ranked[0].workflow;
+  }
+  return state.workflows.find((workflow) => workflow.title === "备课与作业") || state.workflows[0] || null;
+}
+
+function validWorkflowSteps(workflow) {
+  return Array.isArray(workflow?.steps)
+    ? workflow.steps.filter((step) => step.type === "tool" ? Boolean(getTool(step.id) && isPublicTool(getTool(step.id))) : Boolean(getPrompt(step.id)))
+    : [];
+}
+
+function renderWorkflowSummary() {
+  if (state.loadErrors.workflows) {
+    dom.workflowSummary.innerHTML = '<div class="error-state compact-state">推荐路径暂时无法加载。</div>';
+    return;
+  }
+  const workflow = currentWorkflow();
+  if (!workflow) {
+    dom.workflowSummary.innerHTML = '<div class="empty-state compact-state">当前没有可用路径。</div>';
+    return;
+  }
+  const steps = validWorkflowSteps(workflow).slice(0, 5);
+  document.querySelector("#path-title").textContent = `${workflow.title} · 标准路径`;
+  dom.workflowSummary.innerHTML = `
+    <ol class="path-steps">${steps.map((step, index) => `<li><span>${index + 1}</span><strong>${escapeHtml(step.shortLabel || step.label)}</strong></li>`).join("")}</ol>
+    <div class="path-actions">
+      <button class="text-button" type="button" data-workflow-detail="${escapeHtml(workflow.id)}">查看完整路径</button>
+      ${state.activeTask ? '<button class="text-button muted" type="button" data-clear-task>清除任务</button>' : ""}
+    </div>`;
+}
+
+function coreToolForTask() {
+  if (state.activeTask) {
+    const match = state.tools
+      .filter((tool) => tool.featured && isPublicTool(tool) && tool.taskGroups.includes(state.activeTask))
+      .sort((a, b) => a.featuredOrder - b.featuredOrder)[0];
+    if (match) return match;
+  }
+  return getTool("curriculum-to-classroom-workbench") || state.tools.find((tool) => tool.featured && isPublicTool(tool));
+}
+
+function renderCoreTool() {
+  if (state.loadErrors.tools) {
+    dom.coreToolFeature.innerHTML = '<div class="error-state">核心工具暂时无法加载。</div>';
+    return;
+  }
+  const tool = coreToolForTask();
+  if (!tool) {
+    dom.coreToolFeature.innerHTML = '<div class="empty-state">当前没有核心工具。</div>';
+    return;
+  }
+  const preview = safeLocalAsset(tool.screenshotUrl);
+  const tags = [tool.primaryCategory, tool.taskGroups[0]].filter(Boolean).slice(0, 2);
+  dom.coreToolFeature.innerHTML = `
+    <div class="core-visual ${preview ? "has-preview" : ""}">
+      ${preview
+        ? `<img src="${escapeHtml(preview)}" alt="${escapeHtml(tool.name)}真实网页截图" width="1280" height="720" loading="eager" data-preview-image /><span class="image-fallback" hidden>${iconMarkup(tool.icon)}<small>预览图加载失败</small></span>`
+        : `<span class="core-icon">${iconMarkup(tool.icon)}</span>`}
+    </div>
+    <div class="core-content">
+      <p class="eyebrow">核心教学工具</p>
+      <h2 id="core-title">${escapeHtml(tool.name)}</h2>
+      <p>${escapeHtml(tool.homepageSummary)}</p>
+      <div class="tag-row">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+      <div class="core-actions">${toolOpenLink(tool)}<button class="text-button" type="button" data-tool-detail="${escapeHtml(tool.id)}">查看详情</button></div>
+    </div>`;
+}
+
+function miniToolMarkup(tool) {
+  return `
+    <button class="mini-resource" type="button" data-tool-detail="${escapeHtml(tool.id)}">
+      <span>${iconMarkup(tool.icon)}</span>
+      <span><strong>${escapeHtml(tool.name)}</strong><small>${escapeHtml(tool.homepageSummary)}</small></span>
+    </button>`;
+}
+
+function miniPromptMarkup(prompt) {
+  return `
+    <button class="mini-resource" type="button" data-prompt-detail="${escapeHtml(prompt.id)}">
+      <span>${iconMarkup("copy")}</span>
+      <span><strong>${escapeHtml(prompt.title)}</strong><small>${escapeHtml(prompt.homepageSummary)}</small></span>
+    </button>`;
+}
+
+function renderHomeCollections() {
+  const writing = HOME_TOOL_IDS.writing.map(getTool).filter(Boolean);
+  const observation = HOME_TOOL_IDS.observation.map(getTool).filter(Boolean);
+  const reflection = getPrompt("after-class-reflection");
+  dom.writingTools.innerHTML = writing.map(miniToolMarkup).join("");
+  dom.observationTools.innerHTML = observation.map(miniToolMarkup).join("") + (reflection ? miniPromptMarkup(reflection) : "");
+  dom.writingZone.classList.toggle("is-relevant", state.activeTask === "写作与阅读");
+  dom.observationZone.classList.toggle("is-relevant", state.activeTask === "课堂观察与诊断");
+}
+
+function homePrompts() {
+  if (state.activeTask) {
+    const matching = state.prompts
+      .filter((prompt) => prompt.featured && prompt.taskGroups.includes(state.activeTask))
+      .sort((a, b) => a.featuredOrder - b.featuredOrder)
+      .slice(0, 3);
+    if (matching.length) return matching;
+  }
+  return HOME_PROMPT_IDS.map(getPrompt).filter(Boolean);
+}
+
+function renderHomePrompts() {
+  if (state.loadErrors.prompts) {
+    dom.homePromptList.innerHTML = '<div class="error-state compact-state">精选提示词暂时无法加载。</div>';
+    return;
+  }
+  const prompts = homePrompts();
+  dom.homePromptList.innerHTML = prompts.map((prompt) => `
+    <article class="home-prompt-row">
+      <div><span>${escapeHtml(prompt.category)}</span><h3>${escapeHtml(prompt.title)}</h3><p>${escapeHtml(prompt.homepageSummary)}</p></div>
+      <div><button class="small-action copy-action" type="button" data-copy-prompt="${escapeHtml(prompt.id)}">${iconMarkup("copy")}复制</button><button class="text-detail" type="button" data-prompt-detail="${escapeHtml(prompt.id)}">详情</button></div>
+    </article>`).join("") || '<div class="empty-state compact-state">当前没有可推荐提示词。</div>';
+}
+
+function allRecentUpdates() {
+  const toolUpdates = state.tools
+    .filter((tool) => isPublicTool(tool) && /^\d{4}-\d{2}-\d{2}$/.test(tool.updatedAt))
+    .map((tool) => ({ id: tool.id, name: tool.name, date: tool.updatedAt, type: "工具", kind: "tool" }));
+  const promptUpdates = state.prompts
+    .filter((prompt) => /^\d{4}-\d{2}-\d{2}$/.test(prompt.updatedAt))
+    .map((prompt) => ({ id: prompt.id, name: prompt.title, date: prompt.updatedAt, type: "提示词", kind: "prompt" }));
+  return [...toolUpdates, ...promptUpdates].sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name, "zh-CN"));
+}
+
+function formatDate(date) {
+  return date.replaceAll("-", ".");
+}
+
+function renderUpdates() {
+  const updates = allRecentUpdates().slice(0, 3);
+  dom.updateList.innerHTML = updates.map((item) => `
+    <button class="update-row" type="button" ${item.kind === "tool" ? "data-tool-detail" : "data-prompt-detail"}="${escapeHtml(item.id)}">
+      <span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.type)}</small></span>
+      <time datetime="${escapeHtml(item.date)}">${escapeHtml(formatDate(item.date))}</time>
+    </button>`).join("") || '<div class="empty-state compact-state">暂无可靠更新时间。</div>';
+}
+
+function renderHome() {
+  renderQuickTools();
+  renderWorkflowSummary();
+  renderCoreTool();
+  renderHomeCollections();
+  renderHomePrompts();
+  renderUpdates();
 }
 
 function renderTools() {
   if (state.loadErrors.tools) {
     dom.toolCount.textContent = "工具数据加载失败";
-    dom.toolGrid.innerHTML = '<div class="error-state">工具数据暂时无法加载，请稍后刷新；提示词区域不受影响。</div>';
+    dom.toolGrid.innerHTML = '<div class="error-state">工具数据暂时无法加载，请稍后刷新；提示词库不受影响。</div>';
     return;
   }
   const visible = visiblePublicTools();
-  dom.toolCount.textContent = `当前显示 ${visible.length} 个公开工具`;
+  const taskLabel = state.activeTask ? ` · ${state.activeTask}` : "";
+  dom.toolCount.textContent = `${visible.length} 个公开工具${taskLabel}`;
   dom.toolGrid.classList.remove("loading-grid");
-
   if (!visible.length) {
     dom.toolGrid.innerHTML = '<div class="empty-state">没有找到匹配工具。可以更换关键词，或清除任务与分类筛选。</div>';
     return;
   }
-
   dom.toolGrid.innerHTML = visible.map((tool) => `
     <article class="compact-tool-card">
       <span class="compact-tool-icon">${iconMarkup(tool.icon)}</span>
       <div class="compact-tool-main">
         <div class="card-meta"><span>${escapeHtml(tool.primaryCategory)}</span><span>${escapeHtml(tool.platform || typeLabel(tool.type))}</span></div>
-        <h3>${escapeHtml(tool.name)}</h3>
-        <p>${escapeHtml(tool.homepageSummary)}</p>
+        <h2>${escapeHtml(tool.name)}</h2><p>${escapeHtml(tool.homepageSummary)}</p>
       </div>
       <div class="compact-tool-actions">
-        <span class="status-label status-online">${escapeHtml(statusLabel(tool))}</span>
-        ${isOpenable(tool)
-          ? toolOpenLink(tool, "打开", "small-action primary-button")
-          : `<button class="small-action secondary-button" type="button" data-tool-detail="${escapeHtml(tool.id)}">查看详情</button>`}
-        ${isOpenable(tool) ? `<button class="text-detail" type="button" data-tool-detail="${escapeHtml(tool.id)}">详情</button>` : ""}
+        <span class="status-label">${escapeHtml(statusLabel(tool))}</span>
+        ${isOpenable(tool) ? toolOpenLink(tool, "打开", "small-action primary-button") : ""}
+        <button class="text-detail" type="button" data-tool-detail="${escapeHtml(tool.id)}">详情</button>
       </div>
-    </article>
-  `).join("");
+    </article>`).join("");
 }
 
 function renderInternalTools() {
@@ -365,179 +519,62 @@ function renderInternalTools() {
   }
   const internal = state.tools.filter((tool) => ["internal", "maintainer"].includes(tool.visibility));
   dom.internalCount.textContent = `${internal.length} 项 · 校内专用、建设中与能力包`;
-  dom.internalList.innerHTML = internal.length
-    ? internal.map((tool) => `
-      <article class="internal-item">
-        <span class="internal-icon">${iconMarkup(tool.icon)}</span>
-        <div>
-          <div class="card-meta"><span>${escapeHtml(typeLabel(tool.type))}</span><span>${escapeHtml(statusLabel(tool))}</span></div>
-          <h3>${escapeHtml(tool.name)}</h3>
-          <p>${escapeHtml(tool.homepageSummary)}</p>
-        </div>
-        <button class="small-action secondary-button" type="button" data-tool-detail="${escapeHtml(tool.id)}">查看详情</button>
-      </article>
-    `).join("")
-    : '<div class="empty-state">当前没有实验项目或维护者工具。</div>';
+  dom.internalList.innerHTML = internal.length ? internal.map((tool) => `
+    <article class="internal-item">
+      <span class="internal-icon">${iconMarkup(tool.icon)}</span>
+      <div><div class="card-meta"><span>${escapeHtml(typeLabel(tool.type))}</span><span>${escapeHtml(statusLabel(tool))}</span></div><h3>${escapeHtml(tool.name)}</h3><p>${escapeHtml(tool.homepageSummary)}</p></div>
+      <button class="small-action secondary-button" type="button" data-tool-detail="${escapeHtml(tool.id)}">查看详情</button>
+    </article>`).join("") : '<div class="empty-state">当前没有实验项目或维护者工具。</div>';
 }
 
 function renderPrompts() {
   if (state.loadErrors.prompts) {
     dom.promptCount.textContent = "提示词数据加载失败";
-    dom.promptGrid.innerHTML = '<div class="error-state">提示词暂时无法加载，工具区域仍可正常使用。</div>';
+    dom.promptGrid.innerHTML = '<div class="error-state">提示词暂时无法加载，工具库仍可正常使用。</div>';
     return;
   }
   const visible = matchingPrompts();
-  const totalMatching = state.prompts.filter((prompt) => {
-    if (state.activePromptCategory !== "全部" && prompt.category !== state.activePromptCategory) return false;
-    if (state.activeTask && !prompt.taskGroups.includes(state.activeTask)) return false;
-    return matchesQuery(prompt);
-  }).length;
-  dom.promptCount.textContent = `当前显示 ${visible.length} / ${totalMatching} 条提示词`;
-  dom.togglePrompts.hidden = Boolean(state.query || state.activeTask || state.activePromptCategory !== "全部");
-  dom.togglePrompts.textContent = state.showAllPrompts ? "收起为推荐提示词" : "查看全部提示词";
-  dom.togglePrompts.setAttribute("aria-expanded", String(state.showAllPrompts));
+  const taskLabel = state.activeTask ? ` · ${state.activeTask}` : "";
+  dom.promptCount.textContent = `${visible.length} 条提示词${taskLabel}`;
   dom.promptGrid.classList.remove("loading-grid");
-
   if (!visible.length) {
-    dom.promptGrid.innerHTML = '<div class="empty-state">没有找到匹配提示词。可以更换关键词或清除筛选。</div>';
+    dom.promptGrid.innerHTML = '<div class="empty-state">没有找到匹配提示词。可以更换关键词或分类。</div>';
     return;
   }
-
   dom.promptGrid.innerHTML = visible.map((prompt) => `
     <article class="prompt-card">
       <div class="prompt-marker">${iconMarkup("copy")}</div>
       <div class="prompt-content">
         <div class="card-meta"><span>${escapeHtml(prompt.category)}</span><span>${escapeHtml(promptStatusLabel(prompt.status))}</span></div>
-        <h3>${escapeHtml(prompt.title)}</h3>
-        <p>${escapeHtml(prompt.homepageSummary)}</p>
-        <dl class="prompt-prepare">
-          <dt>使用前准备</dt>
-          <dd>${escapeHtml(prompt.inputNeeded || "根据详情准备必要材料，并先完成脱敏。")}</dd>
-        </dl>
+        <h2>${escapeHtml(prompt.title)}</h2><p>${escapeHtml(prompt.homepageSummary)}</p>
+        <dl class="prompt-prepare"><dt>使用前准备</dt><dd>${escapeHtml(prompt.inputNeeded || "根据详情准备必要材料，并先完成脱敏。")}</dd></dl>
       </div>
-      <div class="prompt-actions">
-        <button class="small-action copy-action" type="button" data-copy-prompt="${escapeHtml(prompt.id)}">${iconMarkup("copy")}复制</button>
-        <button class="text-detail" type="button" data-prompt-detail="${escapeHtml(prompt.id)}">查看详情</button>
-      </div>
-    </article>
-  `).join("");
-}
-
-function findWorkflow() {
-  if (state.activeTask) return state.workflows.find((workflow) => workflow.title === state.activeTask) || null;
-  if (state.query.length < 2) return null;
-
-  const query = state.query.toLocaleLowerCase("zh-CN");
-  const ranked = state.workflows.map((workflow) => ({
-    workflow,
-    score: ([workflow.title, workflow.description].join(" ").toLocaleLowerCase("zh-CN").includes(query) ? 4 : 0)
-      + (workflow.toolIds || []).reduce((sum, id) => sum + (itemSearchText(state.tools.find((item) => item.id === id) || {}).includes(query) ? 2 : 0), 0)
-      + (workflow.promptIds || []).reduce((sum, id) => sum + (itemSearchText(state.prompts.find((item) => item.id === id) || {}).includes(query) ? 1 : 0), 0)
-  })).sort((a, b) => b.score - a.score);
-  return ranked[0]?.score > 0 ? ranked[0].workflow : null;
-}
-
-function workflowStepMarkup(step, index) {
-  const item = step.type === "tool"
-    ? state.tools.find((tool) => tool.id === step.id && isPublicTool(tool))
-    : state.prompts.find((prompt) => prompt.id === step.id);
-  if (!item) return "";
-  const name = step.type === "tool" ? item.name : item.title;
-  const detailAttr = step.type === "tool" ? "data-tool-detail" : "data-prompt-detail";
-  return `
-    <li>
-      <span class="step-number">${index + 1}</span>
-      <div><small>${step.type === "tool" ? "工具" : "提示词"}</small><strong>${escapeHtml(step.label)}</strong></div>
-      <button class="step-link" type="button" ${detailAttr}="${escapeHtml(item.id)}">${escapeHtml(name)}</button>
-    </li>
-  `;
-}
-
-function renderWorkflow() {
-  if (state.loadErrors.workflows) {
-    dom.workflowPanel.innerHTML = `
-      <div class="workflow-placeholder error-state">
-        <p class="eyebrow">为你推荐</p>
-        <h2 id="workflow-title">工作流暂时无法加载</h2>
-        <p>基础工具和提示词仍可正常使用。</p>
-      </div>`;
-    return;
-  }
-  const workflow = findWorkflow();
-  if (!workflow) {
-    dom.workflowPanel.innerHTML = `
-      <div class="workflow-placeholder">
-        <p class="eyebrow">为你推荐</p>
-        <h2 id="workflow-title">${state.query ? "没有匹配到明确工作流" : "选择一项任务，获得一条可执行路径"}</h2>
-        <p>${state.query ? "可以继续查看下方搜索结果，或换一个更具体的关键词。" : "工作台会按顺序组合相关工具与提示词；搜索关键词时，也会匹配最接近的任务流。"}</p>
-      </div>`;
-    return;
-  }
-
-  const steps = (workflow.steps || [])
-    .map((step) => {
-      const item = step.type === "tool"
-        ? state.tools.find((tool) => tool.id === step.id && isPublicTool(tool))
-        : state.prompts.find((prompt) => prompt.id === step.id);
-      return item ? step : null;
-    })
-    .filter(Boolean);
-  const relatedTools = (workflow.toolIds || [])
-    .map((id) => state.tools.find((tool) => tool.id === id && isPublicTool(tool)))
-    .filter(Boolean);
-  const relatedPrompts = (workflow.promptIds || [])
-    .map((id) => state.prompts.find((prompt) => prompt.id === id))
-    .filter(Boolean);
-
-  dom.workflowPanel.innerHTML = `
-    <div class="workflow-head">
-      <div>
-        <p class="eyebrow">${state.activeTask ? "当前已选择任务" : "根据搜索为你推荐"}</p>
-        <h2 id="workflow-title">${escapeHtml(workflow.title)}</h2>
-        <p>${escapeHtml(workflow.description)}</p>
-      </div>
-      ${state.activeTask ? '<button class="text-button clear-task" type="button" data-clear-task>清除任务筛选</button>' : ""}
-    </div>
-    <div class="workflow-body">
-      <div>
-        <h3>建议使用顺序</h3>
-        <ol class="workflow-steps">${steps.map(workflowStepMarkup).join("")}</ol>
-      </div>
-      <aside class="workflow-resources" aria-label="相关资源">
-        <div>
-          <h3>相关工具</h3>
-          <div class="resource-links">${relatedTools.map((tool) => `<button type="button" data-tool-detail="${escapeHtml(tool.id)}">${escapeHtml(tool.name)}</button>`).join("") || "<p>暂无可公开工具</p>"}</div>
-        </div>
-        <div>
-          <h3>相关提示词</h3>
-          <div class="resource-links prompt-links">${relatedPrompts.map((prompt) => `<button type="button" data-prompt-detail="${escapeHtml(prompt.id)}">${escapeHtml(prompt.title)}</button>`).join("") || "<p>暂无关联提示词</p>"}</div>
-        </div>
-      </aside>
-    </div>`;
+      <div class="prompt-actions"><button class="small-action copy-action" type="button" data-copy-prompt="${escapeHtml(prompt.id)}">${iconMarkup("copy")}复制</button><button class="text-detail" type="button" data-prompt-detail="${escapeHtml(prompt.id)}">查看详情</button></div>
+    </article>`).join("");
 }
 
 function updateTaskButtons() {
-  dom.taskGrid.querySelectorAll("[data-task]").forEach((button) => {
-    const selected = button.dataset.task === state.activeTask;
+  document.querySelectorAll("[data-task], [data-quick-task]").forEach((button) => {
+    const task = button.dataset.task || button.dataset.quickTask;
+    const selected = task === state.activeTask;
     button.classList.toggle("is-active", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
 }
 
 function renderSuggestions() {
-  if (state.query.length < 2 || state.loadErrors.tools || state.loadErrors.prompts) {
+  if (state.currentView !== "home" || state.query.length < 2 || state.loadErrors.tools || state.loadErrors.prompts) {
     closeSuggestions();
     return;
   }
   const toolMatches = state.tools.filter((tool) => isPublicTool(tool) && matchesQuery(tool)).slice(0, 3);
   const promptMatches = state.prompts.filter(matchesQuery).slice(0, 3);
   if (!toolMatches.length && !promptMatches.length) {
-    dom.searchSuggestions.innerHTML = '<p class="suggestion-empty">没有找到建议，按 Enter 查看完整空状态。</p>';
+    dom.searchSuggestions.innerHTML = '<p class="suggestion-empty">没有找到建议，按 Enter 前往工具库查看结果。</p>';
   } else {
     dom.searchSuggestions.innerHTML = `
       ${toolMatches.length ? `<div class="suggestion-group"><p>工具</p>${toolMatches.map((tool) => `<button type="button" role="option" data-suggestion-tool="${escapeHtml(tool.id)}"><span>${iconMarkup(tool.icon)}</span><span><strong>${escapeHtml(tool.name)}</strong><small>${escapeHtml(tool.primaryCategory)}</small></span></button>`).join("")}</div>` : ""}
-      ${promptMatches.length ? `<div class="suggestion-group"><p>提示词</p>${promptMatches.map((prompt) => `<button type="button" role="option" data-suggestion-prompt="${escapeHtml(prompt.id)}"><span>${iconMarkup("copy")}</span><span><strong>${escapeHtml(prompt.title)}</strong><small>${escapeHtml(prompt.category)}</small></span></button>`).join("")}</div>` : ""}
-    `;
+      ${promptMatches.length ? `<div class="suggestion-group"><p>提示词</p>${promptMatches.map((prompt) => `<button type="button" role="option" data-suggestion-prompt="${escapeHtml(prompt.id)}"><span>${iconMarkup("copy")}</span><span><strong>${escapeHtml(prompt.title)}</strong><small>${escapeHtml(prompt.category)}</small></span></button>`).join("")}</div>` : ""}`;
   }
   dom.searchSuggestions.hidden = false;
   dom.searchInput.setAttribute("aria-expanded", "true");
@@ -548,17 +585,83 @@ function closeSuggestions() {
   dom.searchInput.setAttribute("aria-expanded", "false");
 }
 
-function renderAll() {
-  renderFilters();
-  renderFeaturedTools();
-  renderTools();
-  renderInternalTools();
-  renderPrompts();
-  renderWorkflow();
-  updateTaskButtons();
-  renderSuggestions();
+function syncSearchInputs() {
+  [dom.searchInput, dom.toolSearch, dom.promptSearch].forEach((input) => {
+    if (input.value !== state.query) input.value = state.query;
+  });
   dom.searchClear.hidden = !state.query;
-  dom.onlineOnly.checked = state.onlineOnly;
+}
+
+function setQuery(value, source) {
+  state.query = value.trim();
+  syncSearchInputs();
+  renderTools();
+  renderPrompts();
+  renderWorkflowSummary();
+  renderSuggestions();
+}
+
+function currentViewFromHash() {
+  const candidate = window.location.hash.replace("#", "");
+  return Object.hasOwn(VIEW_NAMES, candidate) ? candidate : "home";
+}
+
+function setView(view, { updateHash = true, focus = false } = {}) {
+  const nextView = Object.hasOwn(VIEW_NAMES, view) ? view : "home";
+  state.currentView = nextView;
+  dom.viewPanels.forEach((panel) => {
+    const active = panel.dataset.viewPanel === nextView;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  });
+  document.querySelectorAll("[data-view]").forEach((button) => {
+    const active = button.dataset.view === nextView;
+    button.classList.toggle("is-active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  document.title = nextView === "home" ? "日新教师 AI 工作台" : `${VIEW_NAMES[nextView]}｜日新教师 AI 工作台`;
+  if (updateHash && window.location.hash !== `#${nextView}`) history.pushState(null, "", `#${nextView}`);
+  closeSuggestions();
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: "auto" });
+  if (focus) document.querySelector(`[data-view-panel="${nextView}"] h1`)?.focus({ preventScroll: true });
+}
+
+function selectTask(task, targetView = "home") {
+  state.activeTask = task;
+  state.activeToolCategory = "全部";
+  state.activePromptCategory = "全部";
+  renderAll();
+  setView(targetView);
+}
+
+function clearTask() {
+  state.activeTask = "";
+  renderAll();
+}
+
+function clearAllFilters() {
+  state.query = "";
+  state.activeTask = "";
+  state.activeToolCategory = "全部";
+  state.activePromptCategory = "全部";
+  state.onlineOnly = false;
+  syncSearchInputs();
+  renderAll();
+}
+
+function openSidebar(force) {
+  const isOpen = typeof force === "boolean" ? force : !dom.sidebar.classList.contains("is-open");
+  dom.sidebar.classList.toggle("is-open", isOpen);
+  dom.sidebarScrim.hidden = !isOpen;
+  dom.menuToggle.setAttribute("aria-expanded", String(isOpen));
+  dom.menuToggle.setAttribute("aria-label", isOpen ? "关闭任务导航" : "打开任务导航");
+  document.body.classList.toggle("nav-open", isOpen);
+}
+
+function closeSidebar() {
+  openSidebar(false);
 }
 
 function detailBlock(title, content, className = "") {
@@ -574,61 +677,60 @@ function detailList(title, values) {
 
 function renderToolDialog(tool, trigger) {
   const preview = safeLocalAsset(tool.screenshotUrl);
-  const relatedPrompts = tool.recommendedPrompts
-    .map((id) => state.prompts.find((prompt) => prompt.id === id))
-    .filter(Boolean);
+  const relatedPrompts = tool.recommendedPrompts.map(getPrompt).filter(Boolean);
   const canOpen = isOpenable(tool);
   dom.dialogContent.innerHTML = `
-    <div class="dialog-heading">
-      <p class="eyebrow">${escapeHtml(typeLabel(tool.type))}</p>
-      <h2 id="dialog-title">${escapeHtml(tool.name)}</h2>
-      <p>${escapeHtml(tool.educationPosition || tool.homepageSummary)}</p>
-      <div class="dialog-meta">
-        <span>${escapeHtml(statusLabel(tool))}</span>
-        <span>${escapeHtml(tool.primaryCategory)}</span>
-        <span>${escapeHtml(tool.platform || typeLabel(tool.type))}</span>
-      </div>
-    </div>
-    ${preview ? `<figure class="tool-preview"><img src="${escapeHtml(preview)}" alt="${escapeHtml(tool.name)}网页截图" width="960" height="540" loading="lazy" data-preview-image /><figcaption>已有网页截图，仅用于了解工具形态。</figcaption><span class="image-fallback" hidden>${iconMarkup(tool.icon)}预览图加载失败</span></figure>` : ""}
+    <div class="dialog-heading"><p class="eyebrow">${escapeHtml(typeLabel(tool.type))}</p><h2 id="dialog-title">${escapeHtml(tool.name)}</h2><p>${escapeHtml(tool.educationPosition || tool.homepageSummary)}</p><div class="dialog-meta"><span>${escapeHtml(statusLabel(tool))}</span><span>${escapeHtml(tool.primaryCategory)}</span><span>${escapeHtml(tool.platform || typeLabel(tool.type))}</span></div></div>
+    ${preview ? `<figure class="tool-preview"><img src="${escapeHtml(preview)}" alt="${escapeHtml(tool.name)}网页截图" width="960" height="540" loading="lazy" data-preview-image /><figcaption>真实网页截图，仅用于了解工具形态。</figcaption><span class="image-fallback" hidden>${iconMarkup(tool.icon)}预览图加载失败</span></figure>` : ""}
     <div class="detail-flow">
-      ${detailBlock("解决什么问题", tool.painPoint || tool.shortDescription)}
-      ${detailBlock("教师怎么用", tool.howToUse)}
-      ${detailList("适用场景", tool.scenarios)}
-      ${detailBlock("教师可能获得什么", tool.teacherBenefit)}
-      ${detailBlock("学生可能获得什么", tool.studentBenefit)}
-      ${detailBlock("使用边界", tool.usageBoundary || tool.displayNote || "使用前请结合真实教学目标与学情进行判断。", "boundary-block")}
-      ${detailBlock("隐私提醒", tool.privacyNote || "涉及学生信息时，请先脱敏并由教师人工审核。", "privacy-block")}
+      ${detailBlock("解决什么问题", tool.painPoint || tool.shortDescription)}${detailBlock("教师怎么用", tool.howToUse)}${detailList("适用场景", tool.scenarios)}${detailBlock("教师可能获得什么", tool.teacherBenefit)}${detailBlock("学生可能获得什么", tool.studentBenefit)}${detailBlock("使用边界", tool.usageBoundary || tool.displayNote || "使用前请结合真实教学目标与学情进行判断。", "boundary-block")}${detailBlock("隐私提醒", tool.privacyNote || "涉及学生信息时，请先脱敏并由教师人工审核。", "privacy-block")}
       ${relatedPrompts.length ? `<section class="detail-block"><h3>关联提示词</h3><div class="related-actions">${relatedPrompts.map((prompt) => `<button type="button" data-prompt-detail="${escapeHtml(prompt.id)}">${escapeHtml(prompt.title)}</button>`).join("")}</div></section>` : ""}
     </div>
-    <div class="dialog-footer">
-      ${canOpen
-        ? `${toolOpenLink(tool)}<p>将在新窗口打开正式公开入口。</p>`
-        : `<div class="availability-note">${iconMarkup("lock")}<span><strong>${escapeHtml(statusLabel(tool))}</strong><small>当前不提供公开跳转，请以状态说明和使用边界为准。</small></span></div>`}
-    </div>`;
+    <div class="dialog-footer">${canOpen ? `${toolOpenLink(tool)}<p>将在新窗口打开正式公开入口。</p>` : `<div class="availability-note">${iconMarkup("lock")}<span><strong>${escapeHtml(statusLabel(tool))}</strong><small>当前不提供公开跳转，请以状态说明和使用边界为准。</small></span></div>`}</div>`;
   openDialog(trigger);
 }
 
 function renderPromptDialog(prompt, trigger) {
-  const relatedTools = prompt.relatedTools
-    .map((id) => state.tools.find((tool) => tool.id === id))
-    .filter(Boolean);
+  const relatedTools = prompt.relatedTools.map(getTool).filter(Boolean);
   dom.dialogContent.innerHTML = `
-    <div class="dialog-heading prompt-dialog-heading">
-      <p class="eyebrow">提示词 · ${escapeHtml(prompt.category)}</p>
-      <h2 id="dialog-title">${escapeHtml(prompt.title)}</h2>
-      <p>${escapeHtml(prompt.scenario)}</p>
-      <div class="dialog-meta"><span>${escapeHtml(promptStatusLabel(prompt.status))}</span><span>${escapeHtml(prompt.platform || "通用")}</span></div>
-    </div>
-    <div class="detail-flow">
-      ${detailBlock("使用前准备", prompt.inputNeeded)}
-      ${detailBlock("期望输出", prompt.outputFormat)}
-      ${detailBlock("使用提醒", prompt.caution, "privacy-block")}
-      <section class="detail-block prompt-full">
-        <div class="prompt-full-head"><h3>完整提示词</h3><button class="small-action copy-action" type="button" data-copy-prompt="${escapeHtml(prompt.id)}">${iconMarkup("copy")}复制提示词</button></div>
-        <pre>${escapeHtml(prompt.prompt)}</pre>
-      </section>
+    <div class="dialog-heading prompt-dialog-heading"><p class="eyebrow">提示词 · ${escapeHtml(prompt.category)}</p><h2 id="dialog-title">${escapeHtml(prompt.title)}</h2><p>${escapeHtml(prompt.scenario)}</p><div class="dialog-meta"><span>${escapeHtml(promptStatusLabel(prompt.status))}</span><span>${escapeHtml(prompt.platform || "通用")}</span></div></div>
+    <div class="detail-flow">${detailBlock("使用前准备", prompt.inputNeeded)}${detailBlock("期望输出", prompt.outputFormat)}${detailBlock("使用提醒", prompt.caution, "privacy-block")}
+      <section class="detail-block prompt-full"><div class="prompt-full-head"><h3>完整提示词</h3><button class="small-action copy-action" type="button" data-copy-prompt="${escapeHtml(prompt.id)}">${iconMarkup("copy")}复制提示词</button></div><pre>${escapeHtml(prompt.prompt)}</pre></section>
       ${relatedTools.length ? `<section class="detail-block"><h3>关联工具</h3><div class="related-actions">${relatedTools.map((tool) => `<button type="button" data-tool-detail="${escapeHtml(tool.id)}">${escapeHtml(tool.name)}</button>`).join("")}</div></section>` : ""}
     </div>`;
+  openDialog(trigger);
+}
+
+function workflowStepMarkup(step, index) {
+  const item = step.type === "tool" ? getTool(step.id) : getPrompt(step.id);
+  if (!item || (step.type === "tool" && !isPublicTool(item))) return "";
+  const name = step.type === "tool" ? item.name : item.title;
+  const detailAttr = step.type === "tool" ? "data-tool-detail" : "data-prompt-detail";
+  return `<li><span class="step-number">${index + 1}</span><div><small>${step.type === "tool" ? "工具" : "提示词"}</small><strong>${escapeHtml(step.label)}</strong></div><button class="step-link" type="button" ${detailAttr}="${escapeHtml(item.id)}">${escapeHtml(name)}</button></li>`;
+}
+
+function renderWorkflowDialog(workflow, trigger) {
+  const steps = validWorkflowSteps(workflow);
+  const relatedTools = arrayValue(workflow.toolIds).map(getTool).filter((tool) => tool && isPublicTool(tool));
+  const relatedPrompts = arrayValue(workflow.promptIds).map(getPrompt).filter(Boolean);
+  dom.dialogContent.innerHTML = `
+    <div class="dialog-heading"><p class="eyebrow">任务标准路径</p><h2 id="dialog-title">${escapeHtml(workflow.title)}</h2><p>${escapeHtml(workflow.description)}</p></div>
+    <div class="detail-flow"><section class="detail-block"><h3>建议使用顺序</h3><ol class="workflow-steps">${steps.map(workflowStepMarkup).join("")}</ol></section>
+      <section class="detail-block"><h3>相关工具</h3><div class="related-actions">${relatedTools.map((tool) => `<button type="button" data-tool-detail="${escapeHtml(tool.id)}">${escapeHtml(tool.name)}</button>`).join("") || "暂无公开工具"}</div></section>
+      <section class="detail-block"><h3>相关提示词</h3><div class="related-actions">${relatedPrompts.map((prompt) => `<button type="button" data-prompt-detail="${escapeHtml(prompt.id)}">${escapeHtml(prompt.title)}</button>`).join("") || "暂无提示词"}</div></section>
+    </div>`;
+  openDialog(trigger);
+}
+
+function renderInfoDialog(type, trigger) {
+  if (type === "privacy") {
+    dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">使用边界</p><h2 id="dialog-title">隐私提醒</h2><p>AI 工具可以帮助整理材料，但不能替代教师的专业判断。</p></div><div class="detail-flow">${detailBlock("学生材料", "上传姓名、照片、作文、评语或家庭信息前，请先删除可识别个人身份的内容。", "privacy-block")}${detailBlock("人工审核", "生成结果需要结合真实学情、教学目标和学校规范进行复核。")}${detailBlock("公开边界", "校内项目和维护者能力包不提供公开入口；状态不明确的链接不会出现在公开页面。")}</div>`;
+  } else if (type === "updates") {
+    const rows = allRecentUpdates().map((item) => `<li><time datetime="${escapeHtml(item.date)}">${escapeHtml(formatDate(item.date))}</time><span>${escapeHtml(item.type)}</span><strong>${escapeHtml(item.name)}</strong></li>`).join("");
+    dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">可维护目录</p><h2 id="dialog-title">最近更新</h2><p>日期表示工作台目录内容最后确认或更新的时间，不等同于外部工具发布日期。</p></div><div class="detail-flow"><section class="detail-block"><ul class="all-updates">${rows || "<li>暂无可靠更新时间。</li>"}</ul></section></div>`;
+  } else {
+    dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">关于工作台</p><h2 id="dialog-title">从真实教学任务出发</h2><p>日新教师 AI 工作台面向小学教师、一线教师培训和校本教研，帮助教师找到可直接执行的工具、提示词与组合路径。</p></div><div class="detail-flow">${detailBlock("维护", "由“字里行间的算法”持续整理与维护，维护者署名：树懒。")}${detailBlock("原则", "首页只保留帮助教师启动行动的入口；完整资源进入工具库和提示词库。")}${detailBlock("责任边界", "工具输出只作辅助，正式教学决策与学生材料使用必须由教师人工审核。", "boundary-block")}</div>`;
+  }
   openDialog(trigger);
 }
 
@@ -656,7 +758,7 @@ function showToast(message, kind = "success") {
 }
 
 async function copyPrompt(promptId, trigger) {
-  const prompt = state.prompts.find((item) => item.id === promptId);
+  const prompt = getPrompt(promptId);
   if (!prompt) return;
   try {
     if (!navigator.clipboard?.writeText) throw new Error("clipboard unavailable");
@@ -680,7 +782,6 @@ function showManualCopy(prompt, trigger) {
     const area = document.createElement("textarea");
     area.id = "manual-copy-area";
     area.readOnly = true;
-    area.value = prompt.prompt;
     wrapper.append(title, note, area);
     dom.dialogContent.appendChild(wrapper);
   }
@@ -691,40 +792,64 @@ function showManualCopy(prompt, trigger) {
   showToast("请手动复制下方内容", "notice");
 }
 
-function selectTask(task) {
-  state.activeTask = task;
-  renderAll();
-  document.querySelector("#search-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function clearAllFilters() {
-  state.query = "";
-  state.activeTask = "";
-  state.activeToolCategory = "全部";
-  state.activePromptCategory = "全部";
-  state.onlineOnly = false;
-  state.showAllPrompts = false;
-  dom.searchInput.value = "";
-  renderAll();
-}
-
-function toggleMenu(force) {
-  const isOpen = typeof force === "boolean" ? force : dom.menuToggle.getAttribute("aria-expanded") !== "true";
-  dom.menuToggle.setAttribute("aria-expanded", String(isOpen));
-  dom.menuToggle.setAttribute("aria-label", isOpen ? "关闭导航菜单" : "打开导航菜单");
-  dom.topNav.classList.toggle("is-open", isOpen);
+function renderAll() {
+  renderFilters();
+  renderHome();
+  renderTools();
+  renderInternalTools();
+  renderPrompts();
+  updateTaskButtons();
+  renderSuggestions();
+  syncSearchInputs();
+  dom.onlineOnly.checked = state.onlineOnly;
 }
 
 function handleDelegatedClick(event) {
+  const viewButton = event.target.closest("[data-view]");
+  if (viewButton) {
+    setView(viewButton.dataset.view);
+    return;
+  }
+  const taskButton = event.target.closest("[data-task]");
+  if (taskButton) {
+    selectTask(taskButton.dataset.task, "home");
+    return;
+  }
+  const quickTask = event.target.closest("[data-quick-task]");
+  if (quickTask) {
+    selectTask(quickTask.dataset.quickTask, "home");
+    return;
+  }
+  const taskView = event.target.closest("[data-task-view]");
+  if (taskView) {
+    selectTask(taskView.dataset.taskView, "tools");
+    return;
+  }
+  if (event.target.closest("[data-open-tasks]")) {
+    openSidebar(true);
+    requestAnimationFrame(() => dom.taskGrid.querySelector("[data-task]")?.focus());
+    return;
+  }
+  const infoButton = event.target.closest("[data-info-dialog]");
+  if (infoButton) {
+    renderInfoDialog(infoButton.dataset.infoDialog, infoButton);
+    return;
+  }
+  const workflowButton = event.target.closest("[data-workflow-detail]");
+  if (workflowButton) {
+    const workflow = state.workflows.find((item) => item.id === workflowButton.dataset.workflowDetail);
+    if (workflow) renderWorkflowDialog(workflow, workflowButton);
+    return;
+  }
   const toolDetail = event.target.closest("[data-tool-detail]");
   if (toolDetail) {
-    const tool = state.tools.find((item) => item.id === toolDetail.dataset.toolDetail);
+    const tool = getTool(toolDetail.dataset.toolDetail);
     if (tool) renderToolDialog(tool, toolDetail);
     return;
   }
   const promptDetail = event.target.closest("[data-prompt-detail]");
   if (promptDetail) {
-    const prompt = state.prompts.find((item) => item.id === promptDetail.dataset.promptDetail);
+    const prompt = getPrompt(promptDetail.dataset.promptDetail);
     if (prompt) renderPromptDialog(prompt, promptDetail);
     return;
   }
@@ -735,60 +860,47 @@ function handleDelegatedClick(event) {
   }
   const suggestionTool = event.target.closest("[data-suggestion-tool]");
   if (suggestionTool) {
-    const tool = state.tools.find((item) => item.id === suggestionTool.dataset.suggestionTool);
     closeSuggestions();
+    const tool = getTool(suggestionTool.dataset.suggestionTool);
     if (tool) renderToolDialog(tool, suggestionTool);
     return;
   }
   const suggestionPrompt = event.target.closest("[data-suggestion-prompt]");
   if (suggestionPrompt) {
-    const prompt = state.prompts.find((item) => item.id === suggestionPrompt.dataset.suggestionPrompt);
     closeSuggestions();
+    const prompt = getPrompt(suggestionPrompt.dataset.suggestionPrompt);
     if (prompt) renderPromptDialog(prompt, suggestionPrompt);
     return;
   }
-  if (event.target.closest("[data-clear-task]")) {
-    state.activeTask = "";
-    renderAll();
-  }
+  if (event.target.closest("[data-clear-task]")) clearTask();
 }
 
-function wireEvents() {
-  dom.menuToggle.addEventListener("click", () => toggleMenu());
-  dom.topNav.addEventListener("click", (event) => {
-    if (event.target.closest("a")) toggleMenu(false);
-  });
-
-  dom.searchInput.addEventListener("input", () => {
-    state.query = dom.searchInput.value.trim();
-    renderTools();
-    renderPrompts();
-    renderWorkflow();
-    renderSuggestions();
-    dom.searchClear.hidden = !state.query;
-  });
-  dom.searchInput.addEventListener("keydown", (event) => {
+function wireSearch(input, enterView) {
+  input.addEventListener("input", () => setQuery(input.value, input));
+  input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
       closeSuggestions();
-      document.querySelector("#search-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (enterView) setView(enterView);
     }
-    if (event.key === "ArrowDown" && !dom.searchSuggestions.hidden) {
+    if (input === dom.searchInput && event.key === "ArrowDown" && !dom.searchSuggestions.hidden) {
       event.preventDefault();
       dom.searchSuggestions.querySelector("button")?.focus();
     }
     if (event.key === "Escape") closeSuggestions();
   });
-  dom.searchClear.addEventListener("click", () => {
-    state.query = "";
-    dom.searchInput.value = "";
-    dom.searchInput.focus();
-    renderAll();
-  });
+}
 
-  dom.taskGrid.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-task]");
-    if (button) selectTask(button.dataset.task);
+function wireEvents() {
+  dom.menuToggle.addEventListener("click", () => openSidebar());
+  dom.sidebarScrim.addEventListener("click", closeSidebar);
+  wireSearch(dom.searchInput, "tools");
+  wireSearch(dom.toolSearch, null);
+  wireSearch(dom.promptSearch, null);
+
+  dom.searchClear.addEventListener("click", () => {
+    setQuery("", dom.searchInput);
+    dom.searchInput.focus();
   });
   dom.toolFilters.addEventListener("click", (event) => {
     const button = event.target.closest("[data-tool-category]");
@@ -801,7 +913,6 @@ function wireEvents() {
     const button = event.target.closest("[data-prompt-category]");
     if (!button) return;
     state.activePromptCategory = button.dataset.promptCategory;
-    state.showAllPrompts = true;
     renderFilters();
     renderPrompts();
   });
@@ -810,10 +921,6 @@ function wireEvents() {
     renderTools();
   });
   dom.clearFilters.addEventListener("click", clearAllFilters);
-  dom.togglePrompts.addEventListener("click", () => {
-    state.showAllPrompts = !state.showAllPrompts;
-    renderPrompts();
-  });
   dom.internalToggle.addEventListener("click", () => {
     const expanded = dom.internalToggle.getAttribute("aria-expanded") === "true";
     dom.internalToggle.setAttribute("aria-expanded", String(!expanded));
@@ -822,11 +929,11 @@ function wireEvents() {
 
   document.addEventListener("click", (event) => {
     handleDelegatedClick(event);
-    if (!event.target.closest(".search-area")) closeSuggestions();
+    if (!event.target.closest(".home-search-area")) closeSuggestions();
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      toggleMenu(false);
+      closeSidebar();
       closeSuggestions();
     }
   });
@@ -846,10 +953,7 @@ function wireEvents() {
     if (lastDialogTrigger?.isConnected) lastDialogTrigger.focus();
     lastDialogTrigger = null;
   });
-
-  window.addEventListener("scroll", () => {
-    dom.header.classList.toggle("is-scrolled", window.scrollY > 12);
-  }, { passive: true });
+  window.addEventListener("hashchange", () => setView(currentViewFromHash(), { updateHash: false }));
 }
 
 function wait(ms) {
@@ -873,28 +977,20 @@ async function fetchJsonWithRetry(url, retries = 3) {
 
 async function init() {
   wireEvents();
+  state.currentView = currentViewFromHash();
   const results = await Promise.allSettled([
     fetchJsonWithRetry("tools.json"),
     fetchJsonWithRetry("prompts.json"),
     fetchJsonWithRetry("workflows.json")
   ]);
-
-  if (results[0].status === "fulfilled" && Array.isArray(results[0].value)) {
-    state.tools = results[0].value.map(normalizeTool).filter((tool) => tool.id);
-  } else {
-    state.loadErrors.tools = true;
-  }
-  if (results[1].status === "fulfilled" && Array.isArray(results[1].value)) {
-    state.prompts = results[1].value.map(normalizePrompt).filter((prompt) => prompt.id);
-  } else {
-    state.loadErrors.prompts = true;
-  }
-  if (results[2].status === "fulfilled" && Array.isArray(results[2].value)) {
-    state.workflows = results[2].value;
-  } else {
-    state.loadErrors.workflows = true;
-  }
+  if (results[0].status === "fulfilled" && Array.isArray(results[0].value)) state.tools = results[0].value.map(normalizeTool).filter((tool) => tool.id);
+  else state.loadErrors.tools = true;
+  if (results[1].status === "fulfilled" && Array.isArray(results[1].value)) state.prompts = results[1].value.map(normalizePrompt).filter((prompt) => prompt.id);
+  else state.loadErrors.prompts = true;
+  if (results[2].status === "fulfilled" && Array.isArray(results[2].value)) state.workflows = results[2].value;
+  else state.loadErrors.workflows = true;
   renderAll();
+  setView(state.currentView, { updateHash: !window.location.hash });
 }
 
 init();
