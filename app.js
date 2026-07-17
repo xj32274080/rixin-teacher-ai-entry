@@ -287,6 +287,19 @@ function matchingPrompts() {
   });
 }
 
+function globalSearchMatches() {
+  return {
+    tools: state.tools.filter((tool) => isPublicTool(tool) && matchesQuery(tool)),
+    prompts: state.prompts.filter(matchesQuery)
+  };
+}
+
+function resolveSearchTargetView(matches = globalSearchMatches()) {
+  if (matches.tools.length > matches.prompts.length) return "tools";
+  if (matches.prompts.length > matches.tools.length) return "prompts";
+  return "";
+}
+
 function toolOpenLink(tool, label = "打开工具", className = "button primary-button") {
   if (!isOpenable(tool)) return "";
   const url = safeExternalUrl(tool.url);
@@ -450,7 +463,7 @@ function renderHomePrompts() {
     </article>`).join("") || '<div class="empty-state compact-state">当前没有可推荐提示词。</div>';
 }
 
-function allRecentUpdates() {
+function allRecentVerifications() {
   const toolUpdates = state.tools
     .filter((tool) => isPublicTool(tool) && /^\d{4}-\d{2}-\d{2}$/.test(tool.updatedAt))
     .map((tool) => ({ id: tool.id, name: tool.name, date: tool.updatedAt, type: "工具", kind: "tool" }));
@@ -465,12 +478,12 @@ function formatDate(date) {
 }
 
 function renderUpdates() {
-  const updates = allRecentUpdates().slice(0, 3);
+  const updates = allRecentVerifications().slice(0, 3);
   dom.updateList.innerHTML = updates.map((item) => `
     <button class="update-row" type="button" ${item.kind === "tool" ? "data-tool-detail" : "data-prompt-detail"}="${escapeHtml(item.id)}">
-      <span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.type)}</small></span>
+      <span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.type)} · 已核验</small></span>
       <time datetime="${escapeHtml(item.date)}">${escapeHtml(formatDate(item.date))}</time>
-    </button>`).join("") || '<div class="empty-state compact-state">暂无可靠更新时间。</div>';
+    </button>`).join("") || '<div class="empty-state compact-state">暂无可靠核验日期。</div>';
 }
 
 function renderHome() {
@@ -567,10 +580,11 @@ function renderSuggestions() {
     closeSuggestions();
     return;
   }
-  const toolMatches = state.tools.filter((tool) => isPublicTool(tool) && matchesQuery(tool)).slice(0, 3);
-  const promptMatches = state.prompts.filter(matchesQuery).slice(0, 3);
+  const matches = globalSearchMatches();
+  const toolMatches = matches.tools.slice(0, 3);
+  const promptMatches = matches.prompts.slice(0, 3);
   if (!toolMatches.length && !promptMatches.length) {
-    dom.searchSuggestions.innerHTML = '<p class="suggestion-empty">没有找到建议，按 Enter 前往工具库查看结果。</p>';
+    dom.searchSuggestions.innerHTML = '<p class="suggestion-empty">没有找到匹配的工具或提示词，请换一个关键词。</p>';
   } else {
     dom.searchSuggestions.innerHTML = `
       ${toolMatches.length ? `<div class="suggestion-group"><p>工具</p>${toolMatches.map((tool) => `<button type="button" role="option" data-suggestion-tool="${escapeHtml(tool.id)}"><span>${iconMarkup(tool.icon)}</span><span><strong>${escapeHtml(tool.name)}</strong><small>${escapeHtml(tool.primaryCategory)}</small></span></button>`).join("")}</div>` : ""}
@@ -726,8 +740,8 @@ function renderInfoDialog(type, trigger) {
   if (type === "privacy") {
     dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">使用边界</p><h2 id="dialog-title">隐私提醒</h2><p>AI 工具可以帮助整理材料，但不能替代教师的专业判断。</p></div><div class="detail-flow">${detailBlock("学生材料", "上传姓名、照片、作文、评语或家庭信息前，请先删除可识别个人身份的内容。", "privacy-block")}${detailBlock("人工审核", "生成结果需要结合真实学情、教学目标和学校规范进行复核。")}${detailBlock("公开边界", "校内项目和维护者能力包不提供公开入口；状态不明确的链接不会出现在公开页面。")}</div>`;
   } else if (type === "updates") {
-    const rows = allRecentUpdates().map((item) => `<li><time datetime="${escapeHtml(item.date)}">${escapeHtml(formatDate(item.date))}</time><span>${escapeHtml(item.type)}</span><strong>${escapeHtml(item.name)}</strong></li>`).join("");
-    dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">可维护目录</p><h2 id="dialog-title">最近更新</h2><p>日期表示工作台目录内容最后确认或更新的时间，不等同于外部工具发布日期。</p></div><div class="detail-flow"><section class="detail-block"><ul class="all-updates">${rows || "<li>暂无可靠更新时间。</li>"}</ul></section></div>`;
+    const rows = allRecentVerifications().map((item) => `<li><time datetime="${escapeHtml(item.date)}">${escapeHtml(formatDate(item.date))}</time><span>${escapeHtml(item.type)} · 已核验</span><strong>${escapeHtml(item.name)}</strong></li>`).join("");
+    dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">可维护目录</p><h2 id="dialog-title">最近核验</h2><p>日期表示工作台目录内容最后确认或核对的时间，不等同于外部工具发布日期。</p></div><div class="detail-flow"><section class="detail-block"><ul class="all-updates">${rows || "<li>暂无可靠核验日期。</li>"}</ul></section></div>`;
   } else {
     dom.dialogContent.innerHTML = `<div class="dialog-heading"><p class="eyebrow">关于工作台</p><h2 id="dialog-title">从真实教学任务出发</h2><p>日新教师 AI 工作台面向小学教师、一线教师培训和校本教研，帮助教师找到可直接执行的工具、提示词与组合路径。</p></div><div class="detail-flow">${detailBlock("维护", "由“字里行间的算法”持续整理与维护，维护者署名：树懒。")}${detailBlock("原则", "首页只保留帮助教师启动行动的入口；完整资源进入工具库和提示词库。")}${detailBlock("责任边界", "工具输出只作辅助，正式教学决策与学生材料使用必须由教师人工审核。", "boundary-block")}</div>`;
   }
@@ -875,13 +889,50 @@ function handleDelegatedClick(event) {
   if (event.target.closest("[data-clear-task]")) clearTask();
 }
 
-function wireSearch(input, enterView) {
+function prepareGlobalSearchResults() {
+  state.activeTask = "";
+  state.activeToolCategory = "全部";
+  state.activePromptCategory = "全部";
+  state.onlineOnly = false;
+  dom.onlineOnly.checked = false;
+  renderFilters();
+  updateTaskButtons();
+}
+
+function handleGlobalSearchEnter() {
+  if (!state.query) {
+    closeSuggestions();
+    return;
+  }
+
+  const matches = globalSearchMatches();
+  const targetView = resolveSearchTargetView(matches);
+  const hasBothTypes = matches.tools.length > 0 && matches.prompts.length > 0;
+
+  if (!matches.tools.length && !matches.prompts.length) {
+    renderSuggestions();
+    showToast("没有找到匹配的工具或提示词，请换一个关键词。", "notice");
+    return;
+  }
+
+  if (!targetView) {
+    renderSuggestions();
+    showToast("工具和提示词匹配数量相同，请从搜索建议中选择。", "notice");
+    return;
+  }
+
+  prepareGlobalSearchResults();
+  closeSuggestions();
+  setView(targetView);
+  if (hasBothTypes) showToast("同时找到工具和提示词，已先显示匹配更多的结果。", "notice");
+}
+
+function wireSearch(input) {
   input.addEventListener("input", () => setQuery(input.value, input));
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      closeSuggestions();
-      if (enterView) setView(enterView);
+      if (input === dom.searchInput) handleGlobalSearchEnter();
     }
     if (input === dom.searchInput && event.key === "ArrowDown" && !dom.searchSuggestions.hidden) {
       event.preventDefault();
@@ -894,9 +945,9 @@ function wireSearch(input, enterView) {
 function wireEvents() {
   dom.menuToggle.addEventListener("click", () => openSidebar());
   dom.sidebarScrim.addEventListener("click", closeSidebar);
-  wireSearch(dom.searchInput, "tools");
-  wireSearch(dom.toolSearch, null);
-  wireSearch(dom.promptSearch, null);
+  wireSearch(dom.searchInput);
+  wireSearch(dom.toolSearch);
+  wireSearch(dom.promptSearch);
 
   dom.searchClear.addEventListener("click", () => {
     setQuery("", dom.searchInput);
