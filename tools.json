@@ -99,12 +99,7 @@
     "type": "webpage",
     "usageBoundary": "活动长图排版器目前校内专用，暂不公开；首页仅保留工具定位和使用边界，不提供截图或跳转入口。",
     "displayNote": "校内专用，暂不公开。",
-    "pendingLinks": [
-      {
-        "label": "活动长图排版器暂不公开，公开入口待确认",
-        "url": "https://xj32274080.github.io/activity-poster-layout/"
-      }
-    ],
+    "pendingLinks": [],
     "statusText": "校内专用，暂不公开"
   },
   {
@@ -261,12 +256,7 @@
     "type": "miaoda",
     "usageBoundary": "这样想象真有趣目前校内专用，暂不公开；详情仅展示网页截图，供教师了解工具形态。",
     "displayNote": "校内专用，暂不公开。",
-    "pendingLinks": [
-      {
-        "label": "这样想象真有趣公开入口待确认",
-        "url": "https://www.miaoda.cn/projects/app-b5wypfc26nsx"
-      }
-    ],
+    "pendingLinks": [],
     "description": "围绕“这样想象真有趣”的习作场景，帮助教师组织创意导入、构思提示和表达展示。",
     "screenshotUrl": "assets/tool-previews/wonder-presentation.png",
     "statusText": "校内专用，暂不公开"
@@ -379,6 +369,8 @@
   },
   {
     "id": "curriculum-to-classroom-workbench",
+    "updatedAt": "2026-07-17",
+    "screenshotUrl": "assets/tool-previews/curriculum-to-classroom-workbench.png",
     "primaryCategory": "教学设计",
     "taskGroups": ["备课与作业"],
     "visibility": "public",
@@ -524,8 +516,8 @@
     "painPoint": "好资料散落在网页、公众号和文档中，难以复用。",
     "howToUse": "输入链接，归档正文、图片和摘要，再进入个人知识库。",
     "privacyNote": "归档公开网页时也要避免保存学生隐私材料。",
-    "link": "https://github.com/xj32274080/web-knowledge-archiver",
-    "url": "https://github.com/xj32274080/web-knowledge-archiver",
+    "link": "",
+    "url": "",
     "status": "internal",
     "platform": "Skill / 能力包",
     "demoUrl": "",
@@ -536,12 +528,7 @@
       "lesson-text-analysis"
     ],
     "source": "GitHub: web-knowledge-archiver",
-    "pendingLinks": [
-      {
-        "label": "GitHub Pages 目前不可用；请补充本地使用说明或教师间接使用工作流",
-        "url": "https://xj32274080.github.io/web-knowledge-archiver/"
-      }
-    ],
+    "pendingLinks": [],
     "aliases": [],
     "type": "skill",
     "usageBoundary": "此项更适合开发者或工具维护者使用，普通教师可通过配套提示词或工作流间接使用。",
@@ -666,6 +653,7 @@
   },
   {
     "id": "student-thinking-tool",
+    "updatedAt": "2026-07-17",
     "primaryCategory": "写作与阅读",
     "taskGroups": ["写作与阅读"],
     "visibility": "public",
@@ -771,18 +759,14 @@
     "type": "miaoda",
     "usageBoundary": "看见写作目前校内专用，暂不公开；详情仅展示网页截图，供教师了解工具形态。",
     "displayNote": "校内专用，暂不公开。",
-    "pendingLinks": [
-      {
-        "label": "看见写作公开入口待确认",
-        "url": "https://app-b37lnel13e9t.appmiaoda.com/role-selection"
-      }
-    ],
+    "pendingLinks": [],
     "description": "面向习作讲评和修改，帮助教师把作文反馈拆成更清楚的问题、修改建议和表达亮点。",
     "screenshotUrl": "assets/tool-previews/three-color-writing-review.png",
     "statusText": "校内专用，暂不公开"
   },
   {
     "id": "four-color-evidence-observer",
+    "updatedAt": "2026-07-17",
     "primaryCategory": "课堂观察与诊断",
     "taskGroups": ["课堂观察与诊断"],
     "visibility": "public",
