@@ -46,10 +46,10 @@ const TASKS = [
   {
     id: "课堂观察与诊断",
     icon: "evidence",
-    title: "我要看看课堂问题",
-    summary: "记录课堂表现，发现学习卡点。",
-    focusTitle: "你现在要看看课堂问题",
-    focusSummary: "先记录真实看到的课堂表现，再判断学生可能卡在哪里。",
+    title: "我要看看学生学得怎么样",
+    summary: "记录课堂表现，发现学习进展和卡点。",
+    focusTitle: "你现在想看看学生学得怎么样",
+    focusSummary: "先记录学生在课堂中的真实表现，再判断哪些地方已经学会、哪些地方还需要帮助。",
     primaryTool: "four-color-evidence-observer",
     primarySummary: "用简单打点记录课堂中的参与和学习表现，课后再根据证据回看。",
     primaryAction: "开始记录课堂",
@@ -103,7 +103,6 @@ const state = {
   activePromptCategory: "全部",
   onlineOnly: false,
   currentView: "home",
-  homeSection: "home",
   loadErrors: { tools: false, prompts: false, workflows: false }
 };
 
@@ -459,7 +458,7 @@ function renderPrompts() {
     <article class="prompt-card">
       <div class="prompt-content">
         <span class="prompt-icon">${iconMarkup("copy")}</span>
-        <div><h2>${escapeHtml(prompt.noviceTitle)}</h2>${prompt.noviceTitle !== prompt.title ? `<p class="formal-title">原指令：${escapeHtml(prompt.title)}</p>` : ""}<p>${escapeHtml(prompt.noviceSummary)}</p><dl class="prompt-prepare"><dt>使用前准备</dt><dd>${escapeHtml(prompt.inputNeeded || "准备与任务有关的材料，并删除个人信息。")}</dd></dl></div>
+        <div><h2>${escapeHtml(prompt.noviceTitle)}</h2><p>${escapeHtml(prompt.noviceSummary)}</p></div>
       </div>
       <div class="prompt-actions"><button class="button primary-button copy-action" type="button" data-copy-prompt="${escapeHtml(prompt.id)}">${iconMarkup("copy")}${escapeHtml(prompt.primaryActionLabel)}</button><button class="secondary-button" type="button" data-prompt-detail="${escapeHtml(prompt.id)}">查看使用说明</button></div>
     </article>`).join("");
@@ -507,6 +506,18 @@ function currentViewFromHash() {
   return Object.hasOwn(VIEW_NAMES, candidate) ? candidate : "home";
 }
 
+function updatePrimaryNavigationState() {
+  const activeNavigation = state.currentView === "home"
+    ? (state.activeTask ? "tasks" : "home")
+    : state.currentView;
+  document.querySelectorAll("[data-nav-view]").forEach((button) => {
+    const active = button.dataset.navView === activeNavigation;
+    button.classList.toggle("is-active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+}
+
 function setView(view, { updateHash = true, focus = false } = {}) {
   const nextView = Object.hasOwn(VIEW_NAMES, view) ? view : "home";
   state.currentView = nextView;
@@ -515,12 +526,7 @@ function setView(view, { updateHash = true, focus = false } = {}) {
     panel.hidden = !active;
     panel.classList.toggle("is-active", active);
   });
-  document.querySelectorAll("[data-nav-view]").forEach((button) => {
-    const navView = button.dataset.navView;
-    const active = nextView === "home" ? navView === state.homeSection : navView === nextView;
-    button.classList.toggle("is-active", active);
-    if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
-  });
+  updatePrimaryNavigationState();
   document.title = nextView === "home" ? "日新教师 AI 工作台" : `${VIEW_NAMES[nextView]}｜日新教师 AI 工作台`;
   if (updateHash && window.location.hash !== `#${nextView}`) history.pushState(null, "", `#${nextView}`);
   closeSuggestions();
@@ -542,7 +548,6 @@ function resetPromptFilters() {
 function openHome() {
   state.query = "";
   state.activeTask = "";
-  state.homeSection = "home";
   resetToolFilters();
   resetPromptFilters();
   renderAll();
@@ -552,7 +557,6 @@ function openHome() {
 function openTaskChooser() {
   state.query = "";
   state.activeTask = "";
-  state.homeSection = "tasks";
   resetToolFilters();
   resetPromptFilters();
   renderAll();
@@ -564,7 +568,6 @@ function selectTask(taskId) {
   if (!TASKS.some((task) => task.id === taskId)) return;
   state.query = "";
   state.activeTask = taskId;
-  state.homeSection = "tasks";
   resetToolFilters();
   resetPromptFilters();
   renderAll();
@@ -913,7 +916,6 @@ function wireEvents() {
   });
   window.addEventListener("hashchange", () => {
     state.currentView = currentViewFromHash();
-    if (state.currentView === "home" && !state.activeTask) state.homeSection = "home";
     setView(state.currentView, { updateHash: false });
   });
 }
