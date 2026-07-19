@@ -1,6 +1,9 @@
 [
   {
     "id": "lesson-text-analysis",
+    "noviceTitle": "帮我分析一篇课文",
+    "noviceSummary": "梳理课文在单元中的位置，找到这一课最值得教的内容。",
+    "primaryActionLabel": "复制给 AI",
     "featured": true,
     "featuredOrder": 1,
     "taskGroups": ["备课与作业", "写作与阅读"],
@@ -29,6 +32,9 @@
   },
   {
     "id": "metaso-research-helper",
+    "noviceTitle": "帮我深入查找课文资料",
+    "noviceSummary": "围绕课文证据查找资料，并整理成可以用于备课的判断。",
+    "primaryActionLabel": "复制给 AI",
     "featured": true,
     "featuredOrder": 2,
     "taskGroups": ["备课与作业"],
@@ -57,6 +63,9 @@
   },
   {
     "id": "homework-design-helper",
+    "noviceTitle": "帮我设计一份作业",
+    "noviceSummary": "根据教学目标和学生情况，设计基础、提升和迁移作业。",
+    "primaryActionLabel": "复制给 AI",
     "featured": true,
     "featuredOrder": 3,
     "taskGroups": ["备课与作业"],
@@ -84,6 +93,9 @@
   },
   {
     "id": "after-class-reflection",
+    "noviceTitle": "帮我完成课后反思",
+    "noviceSummary": "把课堂记录和零散想法整理成有依据的课后反思。",
+    "primaryActionLabel": "复制给 AI",
     "featured": true,
     "featuredOrder": 4,
     "taskGroups": ["备课与作业", "课堂观察与诊断"],
@@ -112,6 +124,9 @@
   },
   {
     "id": "lesson-observation-review",
+    "noviceTitle": "帮我整理听课记录",
+    "noviceSummary": "围绕目标、活动和学生表现，整理听课发现与建议。",
+    "primaryActionLabel": "复制给 AI",
     "featured": true,
     "featuredOrder": 5,
     "taskGroups": ["课堂观察与诊断"],
@@ -138,6 +153,9 @@
   },
   {
     "id": "family-communication-helper",
+    "noviceTitle": "帮我写清楚家校沟通内容",
+    "noviceSummary": "把需要沟通的事实和想法整理成真诚、清楚的文字。",
+    "primaryActionLabel": "复制给 AI",
     "featured": true,
     "featuredOrder": 6,
     "taskGroups": ["班级事务与效率", "成果整理与展示"],
@@ -165,6 +183,9 @@
   },
   {
     "id": "transcript-review-template",
+    "noviceTitle": "帮我整理录音文字稿",
+    "noviceSummary": "把录音转写内容整理成清楚的复盘或点评材料。",
+    "primaryActionLabel": "复制给 AI",
     "featured": false,
     "featuredOrder": null,
     "taskGroups": ["课堂观察与诊断"],

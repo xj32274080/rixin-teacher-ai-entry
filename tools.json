@@ -1,6 +1,9 @@
 [
   {
     "id": "comment-card-printer",
+    "noviceTitle": "期末评语批量排版打印器",
+    "noviceSummary": "粘贴多条评语，快速排成可以打印的成长卡片。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "班级事务",
     "taskGroups": ["班级事务与效率", "成果整理与展示"],
     "visibility": "public",
@@ -52,6 +55,9 @@
   },
   {
     "id": "activity-poster-layout",
+    "noviceTitle": "活动长图排版器",
+    "noviceSummary": "把活动文字和图片整理成一张清楚的长图。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "成果呈现",
     "taskGroups": ["成果整理与展示"],
     "visibility": "internal",
@@ -104,6 +110,9 @@
   },
   {
     "id": "class-magazine-generator",
+    "noviceTitle": "班级作文报纸 / 在线杂志生成器",
+    "noviceSummary": "把学生作文整理成班级报纸、在线刊物或打印版。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "成果呈现",
     "taskGroups": ["成果整理与展示", "写作与阅读"],
     "visibility": "public",
@@ -155,6 +164,9 @@
   },
   {
     "id": "student-artwork-cleaner",
+    "noviceTitle": "学生作品照片清理器",
+    "noviceSummary": "清理作品照片背景，用于作品墙、展板或展示。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "成果呈现",
     "taskGroups": ["成果整理与展示"],
     "visibility": "public",
@@ -204,6 +216,9 @@
   },
   {
     "id": "wonder-presentation",
+    "noviceTitle": "《这样想象真有趣》学习页面",
+    "noviceSummary": "围绕一篇课文开展阅读和想象练习。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "写作与阅读",
     "taskGroups": ["写作与阅读"],
     "visibility": "internal",
@@ -263,6 +278,9 @@
   },
   {
     "id": "rixin-teacher-tools",
+    "noviceTitle": "日新教师工具箱",
+    "noviceSummary": "进入错题记录、课堂计时等常用小工具。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "班级事务",
     "taskGroups": ["课堂观察与诊断", "班级事务与效率"],
     "visibility": "public",
@@ -319,6 +337,9 @@
   },
   {
     "id": "focus-timer",
+    "noviceTitle": "专注计时小站",
+    "noviceSummary": "为课堂任务、练习或活动设置清楚的倒计时。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "班级事务",
     "taskGroups": ["班级事务与效率"],
     "visibility": "public",
@@ -369,6 +390,9 @@
   },
   {
     "id": "curriculum-to-classroom-workbench",
+    "noviceTitle": "课标到课堂｜AI 教学设计工作台",
+    "noviceSummary": "跟着步骤完成一份可以继续修改的教学设计。",
+    "primaryActionLabel": "打开工具",
     "updatedAt": "2026-07-17",
     "screenshotUrl": "assets/tool-previews/curriculum-to-classroom-workbench.png",
     "primaryCategory": "教学设计",
@@ -431,6 +455,9 @@
   },
   {
     "id": "xiaoxue-yuwen-quanjingtu",
+    "noviceTitle": "小学语文要素全景图",
+    "noviceSummary": "按年级、单元或语文要素查看整册学习线索。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "教研与资料",
     "taskGroups": ["备课与作业"],
     "visibility": "public",
@@ -484,6 +511,9 @@
   },
   {
     "id": "web-knowledge-archiver",
+    "noviceTitle": "网页知识归档器",
+    "noviceSummary": "把网页内容整理成便于以后查找的资料。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "教研与资料",
     "taskGroups": ["备课与作业"],
     "visibility": "maintainer",
@@ -537,6 +567,9 @@
   },
   {
     "id": "yulai-reading-wall",
+    "noviceTitle": "《小英雄雨来》阅读交流墙",
+    "noviceSummary": "围绕课文内容开展阅读交流和观点整理。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "写作与阅读",
     "taskGroups": ["写作与阅读"],
     "visibility": "public",
@@ -595,6 +628,9 @@
   },
   {
     "id": "mistake-tracker",
+    "noviceTitle": "错题统计 / 错题记录",
+    "noviceSummary": "记录错题类型和常见原因，为讲评和复习提供依据。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "课堂观察与诊断",
     "taskGroups": ["课堂观察与诊断", "班级事务与效率"],
     "visibility": "public",
@@ -653,6 +689,9 @@
   },
   {
     "id": "student-thinking-tool",
+    "noviceTitle": "写作思维小助手",
+    "noviceSummary": "通过简单追问，帮助学生把想法慢慢说清楚。",
+    "primaryActionLabel": "打开工具",
     "updatedAt": "2026-07-17",
     "primaryCategory": "写作与阅读",
     "taskGroups": ["写作与阅读"],
@@ -706,6 +745,9 @@
   },
   {
     "id": "three-color-writing-review",
+    "noviceTitle": "看见写作",
+    "noviceSummary": "整理作文中的亮点和问题，帮助教师准备讲评。",
+    "primaryActionLabel": "打开工具",
     "primaryCategory": "写作与阅读",
     "taskGroups": ["写作与阅读"],
     "visibility": "internal",
@@ -766,6 +808,9 @@
   },
   {
     "id": "four-color-evidence-observer",
+    "noviceTitle": "四色证据链观察器",
+    "noviceSummary": "记录学生在课堂中的真实参与和学习表现。",
+    "primaryActionLabel": "打开工具",
     "updatedAt": "2026-07-17",
     "primaryCategory": "课堂观察与诊断",
     "taskGroups": ["课堂观察与诊断"],
