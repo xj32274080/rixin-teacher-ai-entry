@@ -60,13 +60,14 @@
     "title": "成果整理与展示",
     "description": "整理活动材料和学生作品，经过审核后形成正式成果。",
     "icon": "newspaper",
-    "toolIds": ["class-magazine-generator", "student-artwork-cleaner", "comment-card-printer", "activity-poster-layout"],
+    "toolIds": ["class-magazine-generator", "student-artwork-cleaner", "comment-card-printer", "activity-poster-layout", "wechat-layout-workbench"],
     "promptIds": ["family-communication-helper"],
     "steps": [
       {"type": "tool", "id": "student-artwork-cleaner", "label": "清理作品照片并移除可识别信息", "shortLabel": "图片清理"},
       {"type": "tool", "id": "class-magazine-generator", "label": "把作文整理成班级刊物或打印版", "shortLabel": "刊物排版"},
       {"type": "tool", "id": "comment-card-printer", "label": "需要时制作评语或成长卡片", "shortLabel": "成长卡片"},
-      {"type": "prompt", "id": "family-communication-helper", "label": "整理对外发布或家校沟通文字", "shortLabel": "发布文字"}
+      {"type": "prompt", "id": "family-communication-helper", "label": "整理对外发布或家校沟通文字", "shortLabel": "发布文字"},
+      {"type": "tool", "id": "wechat-layout-workbench", "label": "把定稿文章排版并复制到公众号编辑器", "shortLabel": "公众号排版"}
     ]
   },
   {
